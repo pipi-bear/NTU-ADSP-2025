@@ -1,0 +1,7 @@
+# .gitignore for ASDP/HW/
+
+*.aux
+*.out
+*.log
+
+.DS_Store
