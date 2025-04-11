@@ -41,8 +41,8 @@ A_ext = zeros(k+2,k+2);      % Matrix A_ext (\in \mathbb{R}^{(k+2) \times (k+2)}
 S = zeros(k+2,1);            % Vector S (\in \mathbb{R}^{(k+2) \times 1})
 
 % Randomly choose the initial values for k+2 = 11 extreme points in [0, 0.5] (should not in transition band to guarantee convergence)
-F_ext = [0.1;0.13;0.15;0.17;0.2;0.23;0.35;0.37;0.4;0.43;0.45]; 
-Hd_ext = double(F_ext >= Pb_l);          % Vector H with k+2 elements, each \in {0, 1}, representing the desired filter response at the extreme points
+F_ext = [0.05;0.12;0.15;0.17;0.21;0.23;0.36;0.38;0.41;0.43;0.47]; 
+Hd_ext = double(F_ext >= Pb_l);     % Vector H with k+2 elements, each \in {0, 1}, representing the desired filter response at the extreme points
 P = F_ext;                          % Initialize the local maxmial / minimal points by F_ext
 W_ext = zeros(size(F_ext));         % Initialize the weight vector for the extreme points
 
@@ -59,8 +59,8 @@ end
 iteration = 0;
 while (E_1 - E_0 > delta || E_1 - E_0 < 0) 
     iteration = iteration + 1;
-    % disp(['E_1 = ', num2str(E_1), ', E_0 = ', num2str(E_0)]);
-    % disp(['F_ext size: ', num2str(size(F_ext))]);
+    disp(['E_1 = ', num2str(E_1), ', E_0 = ', num2str(E_0)]);
+    disp(['F_ext size: ', num2str(size(F_ext))]);
     
     E_1 = E_0;                                                  % set the previous error to the current error
     
@@ -99,76 +99,120 @@ while (E_1 - E_0 > delta || E_1 - E_0 < 0)
 
     % STEP 4
     count = 0;          % count the number of the extreme points
-    err_ext = [];       % store the error of the extreme points
-    location_ext = [];  % store the location of the extreme points
-    
-    % Pre-allocate arrays with correct size to ensure consistency
-    F_ext = zeros(k+2, 1);      % Reset F_ext to ensure it has exactly k+2 elements
-    err_ext = zeros(1, k+2);    % Make err_ext a row vector with k+2 elements
-    location_ext = zeros(1, k+2); % Make location_ext a row vector with k+2 elements
+    F_ext = [];      
+    err_ext = [];    
+    location_ext = []; 
     
     for i = 1:length(F_all)
         % leftmost point
         if i == 1
-            if err(i) > err(i+1) && err(i) > 0  % local maximum
+            if abs(err(i+1)) < abs(err(i))
                 count = count + 1;
-                P(count) = F_all(i);
-                err_ext(count) = abs(err(i));
-                location_ext(count) = i;
-            elseif err(i) < err(i+1) && err(i) < 0  % local minimum
-                count = count + 1;
-                P(count) = F_all(i);
+                F_ext(count) = F_all(i);
                 err_ext(count) = abs(err(i));
                 location_ext(count) = i;
             end
         % rightmost point
         elseif i == length(F_all)
-            if err(i) > err(i-1) && err(i) > 0  % local maximum
+            if (abs(err(i-1)) < abs(err(i) ) )
                 count = count + 1;
-                P(count) = F_all(i);
-                err_ext(count) = abs(err(i));
-                location_ext(count) = i;
-            elseif err(i) < err(i-1) && err(i) < 0  % local minimum
-                count = count + 1;
-                P(count) = F_all(i);
+                F_ext(count) = F_all(i);
                 err_ext(count) = abs(err(i));
                 location_ext(count) = i;
             end
-        else
-            if err(i) > err(i-1) && err(i) > err(i+1)   % local maximal
+        elseif  (abs(err(i-1)) < abs(err(i)) && abs(err(i+1)) < abs(err(i)))
                 count = count + 1;
-                P(count) = F_all(i);
+                F_ext(count) = F_all(i);
                 err_ext(count) = abs(err(i));
                 location_ext(count) = i;
-            elseif err(i) < err(i-1) && err(i) < err(i+1)   % local minimal
-                count = count + 1;
-                P(count) = F_all(i);
-                err_ext(count) = abs(err(i));
-                location_ext(count) = i;
-            end
         end
     end
 
-    % disp(['Found ', num2str(count), ' extreme points']);
-    % disp('P values:');
-    % disp(P');  % Transpose to display as row for readability
+    disp(['Found ', num2str(count), ' extreme points']);
+    disp('F_ext values:');
+    disp(F_ext');  % Transpose to display as row for readability
     
-    % disp('err_ext values:');
-    % disp(err_ext);
+    disp('err_ext values:');
+    disp(err_ext);
     
-    % disp('location_ext values:');
-    % disp(location_ext);
+    disp('location_ext values:');
+    disp(location_ext);
     
-    [max_value, max_loc] = findpeaks(err);
-    [min_value, min_loc] = findpeaks(-err);
-
-    F_ext = sort([0 (max_loc-1)*delta (min_loc-1) * delta 0.5]);
-    F_ext = F_ext';
-
+    % if more than k+2 extreme points:
+    % 1. choose the nonboundary ones
+    % 2. if there are still more than k+2, sort and choose the k+2 ones with the largest |error value|
+    if count >= (k+2) + 2       % if we have >= two more than required
+        disp(['Too many (', num2str(count), ') extreme points, selecting subset']);
+        [err_ext, idx] = sort(err_ext, 'descend');
+        F_ext = F_ext(idx);
+        location_ext = location_ext(idx);
+        if 1 in location_ext 
+            
+        if length(err_ext) > k+2
+            % if still more than k+2 after removing the boundaries, sort and choose the k+2 ones with the largest |error value|
+            [err_ext, idx] = sort(err_ext, 'descend');
+            F_ext = F_ext(idx);                         % reorder F_ext by the order of the sorted err_ext
+            location_ext = location_ext(idx);           % reorder location_ext by the order of the sorted err_ext
+            err_ext = err_ext(1:k+2);                   % preserve the k+2 largest ones by truncating since this list if sorted
+            F_ext = F_ext(1:k+2);
+            location_ext = location_ext(1:k+2);
+        else
+            % if we have exactly k+2 extreme points, sort
+            [err_ext, idx] = sort(err_ext, 'descend');
+            F_ext = F_ext(idx);
+            location_ext = location_ext(idx);
+        end
+    elseif count == (k+2) + 1   % if we have one more than required
+        disp('One extra extreme point, removing one');
+        if location_ext(1) == 1 && location_ext(k+2) == length(F_all)
+            if err_ext(1) > err_ext(k+2)  
+                % Discard the last element
+                err_ext(end) = [];
+                F_ext(end) = [];
+                location_ext(end) = [];
+            else
+                % Discard the first element
+                err_ext(1) = [];
+                F_ext(1) = [];
+                location_ext(1) = [];
+            end
+        elseif location_ext(1) == 1 || location_ext(1) == length(F_all)
+            err_ext(1) = [];
+            F_ext(1) = [];
+            location_ext(1) = [];
+        elseif location_ext(k+2) == length(F_all) || location_ext(k+2) == 1
+            err_ext(end) = [];
+            F_ext(end) = [];
+            location_ext(end) = [];
+        else
+            [err_ext, idx] = sort(err_ext, 'descend');
+            F_ext = F_ext(idx);
+            location_ext = location_ext(idx);
+            err_ext = err_ext(1:k+2);                   
+            F_ext = F_ext(1:k+2);
+            location_ext = location_ext(1:k+2);
+        end
+        [err_ext, idx] = sort(err_ext, 'descend');
+        F_ext = F_ext(idx);
+        location_ext = location_ext(idx);
+    else                        % if we have exactly k+2 extreme points, sort
+        disp('Exactly k+2 extreme points, sort');
+        [err_ext, idx] = sort(err_ext, 'descend');
+        F_ext = F_ext(idx);
+        location_ext = location_ext(idx);
+    end
+    disp(['F_ext size after processing: ', num2str(size(F_ext))]);
+    disp ('F_ext:');
+    disp (F_ext);
+    disp ('err_ext:');
+    disp (err_ext);
+    disp ('location_ext:');
+    disp (location_ext);
+    
     % STEP 5
     % E_0 = max(|err(F)|)                       (p.61)   
     E_0 = max(err_ext);
-    % disp(['New E_0 (current error): ', num2str(E_0)]);
+    disp(['New E_0 (current error): ', num2str(E_0)]);
     if E_1 - E_0 > delta || E_1 - E_0 < 0
         % if the error is not in the convergence threshold, continue from step 2
         % update the weight vector W_ext 
@@ -188,19 +232,12 @@ while (E_1 - E_0 > delta || E_1 - E_0 < 0)
         % if the error is in the convergence threshold, stop the iteration
         break;
     end
-    fprintf('\niteration =')    
+
+    fprintf('\nCurrent iteration =')    
     disp(iteration) 
-    fprintf('Maximal error for this iteration =')
-    disp(max(err_ext))
+    fprintf('max(E) =')
+    disp(max(E))
 end
-
-fprintf('\niteration =')    
-disp(iteration) 
-fprintf('Maximal error for this iteration =')
-disp(max(err_ext))
-
-
-
 
 % STEP 6
 h(k+1,1) = S(1);                % h[k] = s[0]
