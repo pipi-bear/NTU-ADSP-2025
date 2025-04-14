@@ -3,5 +3,6 @@
 *.aux
 *.out
 *.log
+*.synctex.gz
 
 .DS_Store
