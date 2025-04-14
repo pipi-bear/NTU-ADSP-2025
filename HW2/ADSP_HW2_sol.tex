@@ -156,7 +156,7 @@ The roots of $2z^2 + 2z + 1$ are $\{\frac{-1 \pm j}{2}\}$
 Therefore, $H(z)$ is:
 
 \begin{align*}
-    H(z) = \frac{(z - 2)(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)} 
+    H(z) = \frac{2(z - 2)(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)} 
 \end{align*}
 
 The poles and zeros are:
@@ -171,8 +171,9 @@ we can convert $H(z)$ into a minimum phase filter $H_1(z)$ as follows:
 
 \begin{align*}
     H_1(z) 
-    &= \frac{(z - 2)(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)} \textcolor{orange}{\times 2 \frac{(z - 0.5)}{(z - 2)}} \\
-    &= \textcolor{orange}{2} \frac{\textcolor{orange}{(z - 0.5)}(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)(z - 2)}
+    &= \frac{2(z - 2)(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)} \textcolor{orange}{\times 2 \frac{(z - 0.5)}{(z - 2)}} \\
+    &= \textcolor{orange}{2} \frac{2\textcolor{orange}{(z - 0.5)}(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)(z - 2)} \\
+    &= 4 \frac{(z - 0.5)(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)(z - 2)}
 \end{align*}
 
 \subsection*{(b)}
@@ -180,13 +181,13 @@ we can convert $H(z)$ into a minimum phase filter $H_1(z)$ as follows:
 From the previous subsection, we have:
 
 \begin{align*}
-    H_1(z) = 2 \frac{(z - 0.5)(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)(z - 2)}
+    H_1(z) = 4 \frac{(z - 0.5)(z - \frac{-1 + j}{2})(z - \frac{-1 - j}{2})}{(z - 0.5)(z - 0.2)(z - 2)}
 \end{align*}
 
 This is equivalent to:
 
 \begin{align*}
-    H(z) = z^{3 - 2} \times 2 \times \frac{(z - 0.5)(1 - \frac{-1 + j}{2}z^{-1})(1 - \frac{-1 - j}{2}z^{-1})}{(1 - 0.5z^{-1})(1 - 0.2z^{-1})} 
+    H(z) = z^{3 - 2} \times 4 \times \frac{(z - 0.5)(1 - \frac{-1 + j}{2}z^{-1})(1 - \frac{-1 - j}{2}z^{-1})}{(1 - 0.5z^{-1})(1 - 0.2z^{-1})} 
 \end{align*}
 
 Using the notations of ppt p.186, we have:
@@ -195,7 +196,7 @@ Using the notations of ppt p.186, we have:
     \item zeros inside the unit circle: $a_1 = \frac{-1 + j}{2}, \ a_2 = \frac{-1 - j}{2}$
     \item zeros outside the unit circle: $b_1^{-1} = 2 \ (b_1 = 0.5)$
     \item poles inside the unit circle: $c_1 = 0.5, \ c_2 = 0.2$
-    \item $A = 2$
+    \item $A = 4$
 \end{itemize}
 
 By directly using the formula of ppt p.188, we would get the cepstrum:
@@ -203,7 +204,7 @@ By directly using the formula of ppt p.188, we would get the cepstrum:
 \begin{equation*}
 \hat{x}[n] = 
     \begin{cases}
-    log(A) = log(2) \qquad &,n = 0\\
+    log(A) = log(4) \qquad &,n = 0\\
     - \frac{a_1^n}{n} - \frac{a_2^n}{n} + \frac{c_1^n}{n} + \frac{c_2^n}{n} = - \frac{(\frac{-1 + j}{2})^n}{n} - \frac{(\frac{-1 - j}{2})^n}{n} + \frac{(0.5)^n}{n} + \frac{(0.2)^n}{n} \qquad &,n > 0\\
     \frac{b_1^n}{n} =  \frac{(0.5)^n}{n} \qquad &,n < 0\\
     \end{cases}
