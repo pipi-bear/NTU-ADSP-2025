@@ -10,11 +10,14 @@ For the homework part, you can find a readme file (named `HW*_readme.md`) under 
 - each file's usage
 - score of this assignment
 
-:warning: **IMPORTANT**: I really recommend reading these readme files (`HW*_readme.md`) since some files might be wrong, and are not included in the final handed in version !
+:warning: **IMPORTANT**: I really recommend reading these readme files (`HW*_readme.md`) since <ins>some files might be wrong, and are not included in the final handed in version !</ins>
 
 ## Lecture notes
 
 In the `Lecture_notes` subdirectory, some pdf files are contained, they are the lecture ppts (version with written notes) by the professor, and my own notes added.
+
+Also, you may find that my handwritings are hard to read :cry:  
+I knew that so <ins>I changed into typing for most of the notes after p.121 of `ADSP_Write2`</ins>, so if you are frustrated recognizing the contents of my notes, you can start reading from here! 
 
 ### Two versions of ADSP_Write2.pdf
 
