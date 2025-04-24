@@ -1,0 +1,199 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[]{amsthm} 
+\usepackage[]{amssymb} 
+\usepackage{amsmath}
+\newcommand{\modwos}[1]{\ (\mathrm{mod}\ #1)}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage[thinc]{esdiff}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{float}
+
+\title{ADSP: HW3}
+\author{Lo Chun, Chou \\ R13922136}
+\date\today
+
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\maketitle 
+
+\section*{(1)}
+
+\section*{(2)}
+
+\subsection*{(a)}
+
+By Fermat's little theorem, since $67$ is a prime number, we have:
+
+\begin{align*}
+    2^{66} \equiv 1 \modwos{67}
+\end{align*}
+
+Then using the fact that:
+
+\begin{align*}
+    \text{if } a \equiv b \modwos{n} \text{ then } a^k \equiv b^k \modwos{n} \text{ for any integer } k \in \mathbb{Z}^+
+\end{align*}
+
+we have:
+
+\begin{align*}
+    &(2^{66})^{10} \equiv 1^{10} \modwos{67} \\
+    \Rightarrow \ & 2^{660} \equiv 1 \modwos{67}
+\end{align*}
+
+And using the property:
+
+\begin{align*}
+    \text{If } a \equiv b \modwos{n} \text{ and } c \equiv d \modwos{n} \text{ then } a \cdot c \equiv b \cdot d \modwos{n}
+\end{align*}
+
+We can calculate $2^{40}$:
+
+\begin{align*}
+    &2^6 \equiv 64 \equiv -3 \modwos{67} \\
+    \Rightarrow \ & (2^6)^6 \equiv (-3)^6 \equiv 243 \times 3 \equiv 42 \times 3 \equiv 126 \equiv -8 \modwos{67} \\
+    \Rightarrow \ & 2^{40} \equiv 2^{36} \times 2^4 \equiv (-8) \times 16 \equiv -128 \equiv 6 \modwos{67}
+\end{align*}
+
+
+and combine $2^{40}$ with $2^{660}$, and we'll get the required result:
+
+\begin{align*}
+    2^{700} \modwos{67}
+    &\equiv 2^{660} \cdot 2^{40} \modwos{67} \\
+    &\equiv 1 \cdot 6 \modwos{67} \\
+    &\equiv 6 \modwos{67} \qquad \square
+\end{align*}
+
+\subsection*{(b)}
+
+We're given the following congruences and are required to find $x \in \mathbb{Z}^+, \quad x \in [0, 2800]$:
+
+\begin{align*}
+    x &\equiv 4 \modwos{43} \\
+    x &\equiv 15 \modwos{67} 
+\end{align*}
+
+Since $\gcd (43, 67) = 1$, we can use the Chinese Remainder Theorem.
+\bigskip
+
+Let $n_1 = 43$ and $n_2 = 67$, then we'll have:
+
+\begin{align*}
+    &n = n_1 \cdot n_2 = 2881 \\
+    &N_1 = \frac{n}{n_1} = 67 \\
+    &N_2 = \frac{n}{n_2} = 43 
+\end{align*}
+
+And we'll need to solve:
+
+\begin{align*}
+    N_1 x_1 \equiv 1 \modwos{n_1} &\implies 67 x_1 \equiv 1 \modwos{43} \\
+    N_2 x_2 \equiv 1 \modwos{n_2} &\implies 43 x_2 \equiv 1 \modwos{67}
+\end{align*}
+
+Using the Extended Euclidean Algorithm:
+
+\begin{align*}
+    67 = 1 \cdot 43 + 24 \quad \Rightarrow &\ 24 = 67 - 1 \cdot 43 \\
+    43 = 1 \cdot 24 + 19 \quad \Rightarrow &\ 19 = 43 - 1 \cdot 24 \\
+    24 = 1 \cdot 19 + 5 \quad \Rightarrow &\ 5 = 24 - 1 \cdot 19 \\
+    19 = 3 \cdot 5 + 4 \quad \Rightarrow &\ 4 = 19 - 3 \cdot 5 \\
+    5 = 1 \cdot 4 + 1 \quad \Rightarrow &\ 1 = 5 - 1 \cdot 4
+\end{align*}
+
+then we'll get:
+
+\begin{align*}
+    1 
+    &= 5 - 1 \cdot 4 \\
+    &= 5 - 1 \cdot (19 - 3 \cdot 5) \\
+    &= 5 - 1 \cdot 19 + 3 \cdot 5 \\
+    &= 4 \cdot 5 - 1 \cdot 19 \\
+    &= 4 \cdot (24 - 1 \cdot 19) - 1 \cdot 19 \\
+    &= 4 \cdot 24 - 5 \cdot 19 \\
+    &= 4 \cdot 24 - 5 \cdot (43 - 1 \cdot 24) \\
+    &= 9 \cdot 24 - 5 \cdot 43 \\
+    &= 9 \cdot (67 - 1 \cdot 43) - 5 \cdot 43 \\
+    &= 9 \cdot 67 - 14 \cdot 43
+\end{align*}
+
+Thus, $x_1 = 9, \ x_2 = -14 \ (\text{or } x_2 = 53)$.
+\bigskip
+
+And the solution $\bar{x}$ is:
+
+\begin{align*}
+    \bar{x}
+    &\equiv N_1 \cdot x_1 \cdot 4 + N_2 \cdot x_2 \cdot 15 \modwos{n} \\
+    &\equiv 67 \cdot 9 \cdot 4 + 43 \cdot (-14) \cdot 15 \modwos{2881} \\
+    &\equiv 2412 - 9030 \modwos{2881} \\
+    &\equiv -6618 \modwos{2881} \\
+    &\equiv 2025 \modwos{2881} \qquad \square
+\end{align*}
+
+\subsection*{(c)}
+
+By Wilson's theorem, we knew that if $p$ is a prime, then:
+
+\begin{align*}
+    (p-1)! \equiv -1 \modwos{p}
+\end{align*}
+
+Thus, since $43$ is a prime, we have:
+
+\begin{align*}
+    &42! \equiv -1 \modwos{43} \\
+    \Rightarrow \ & 39! \times 40 \times 41 \times 42 \equiv 42 \modwos{43}
+\end{align*}
+
+By another property of modular arithmetic, we have:
+
+\begin{align*}
+    \text{If } ca \equiv cb \modwos{n} \text{ and } \gcd(c, n) = 1 \text{ then } a \equiv b \modwos{n}
+\end{align*}
+
+Therefore, since $\gcd(42, 43) = 1$, we can divide $42$ on both sides:
+
+\begin{align*}
+    &39! \times 40 \times 41 \equiv 1 \modwos{43} \\
+\end{align*}
+
+Thus, this means that $39!$ is the inverse of $40 \times 41 \modwos{43}$.
+
+\begin{align*}
+    40 \times 41 \equiv (-3) \times (-2) \equiv 6 \modwos{43}
+\end{align*}
+
+
+Solving this using the Extended Euclidean Algorithm:
+
+\begin{align*}
+    43 = 6 \cdot 7 + 1 \quad \Rightarrow \ 1 = 43 - 6 \cdot 7 
+\end{align*}
+
+So we found that the inverse of $6$ is $-7$ or $36 \modwos{43}$. And hence the solution is:
+
+\begin{align*}
+    39! \equiv 36 \modwos{43} \qquad \square
+\end{align*}
+
+
+\section*{(3)}
+
+\section*{(4)}
+
+\section*{(5)}
+
+\section*{(6)}
+
+\section*{(7)}
+
+\section*{Extra problems}
+
+\end{document}
