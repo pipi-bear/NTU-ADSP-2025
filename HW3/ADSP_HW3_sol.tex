@@ -11,6 +11,7 @@
 \usepackage[thinc]{esdiff}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{float}
+\graphicspath{ {./HW3_img/} }
 
 \title{ADSP: HW3}
 \author{Lo Chun, Chou \\ R13922136}
@@ -186,14 +187,189 @@ So we found that the inverse of $6$ is $-7$ or $36 \modwos{43}$. And hence the s
 
 \section*{(3)}
 
+We're given:
+
+\begin{align*}
+    M = 11, \ \alpha = 8 + 6i, \ N = 12
+\end{align*}
+
+Since $N$ has factors: $d \in \{1, 2, 3, 4, 6, 12\}$, we can define:
+
 \section*{(4)}
+
+
+Using the following properties:
+
+\begin{align*}
+    \left(\frac{2}{p}\right) = 
+    \begin{cases}
+        1 \quad &p \equiv 1, 7 \modwos{8} \\
+        -1 \quad &p \equiv 3, 5 \modwos{8}
+    \end{cases}\tag{1}
+\end{align*}
+
+And referencing the following table
+\footnote{
+    \url{https://en.wikipedia.org/wiki/Quadratic_residue}
+}:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{HW3_img/quadratic_residue.png}
+\end{figure}
+
+
+
+\begin{align*}
+    a \equiv b \modwos{p} \implies \left(\frac{a}{p}\right) = \left(\frac{b}{p}\right) \tag{2}
+\end{align*}
+
+\begin{align*}
+    \left(\frac{ab}{p}\right) = \left(\frac{a}{p}\right) \left(\frac{b}{p}\right) \tag{3}
+\end{align*}
+
+We can calculate the Legendre sequence for $p = 11$:
+
+\begin{align*}
+    & \left(\frac{1}{11}\right) = 1 \qquad \because 1 \equiv 1^2 \modwos{11} \\
+    & \left(\frac{2}{11}\right) = -1 \qquad \because \text{Using }(1), \ 11 \equiv 3 \modwos{8} \\ 
+    & \left(\frac{3}{11}\right) = 1 \qquad \because 3 \equiv 25 \equiv 5^2 \modwos{11} \\
+    & \left(\frac{4}{11}\right) = 1 \qquad \because 4 \equiv 81 \equiv 9^2 \modwos{11} \\
+    & \left(\frac{5}{11}\right) = 1 \qquad \because 5 \equiv 16 \equiv 4^2 \modwos{11} \\
+    & \left(\frac{6}{11}\right) = \left(\frac{2}{11}\right) \left(\frac{3}{11}\right) = (-1) \times 1 = -1 \\
+    & \left(\frac{7}{11}\right) = -1 \qquad \text{(Using the table)} \\
+    & \left(\frac{8}{11}\right) = \left(\frac{2}{11}\right) \left(\frac{4}{11}\right) = (-1) \times 1 = -1 \\
+    & \left(\frac{9}{11}\right) = \left(\frac{3}{11}\right) \left(\frac{3}{11}\right) = 1 \times 1 = 1 \\
+    & \left(\frac{10}{11}\right) = \left(\frac{2}{11}\right) \left(\frac{5}{11}\right) = (-1) \times 1 = -1 \\
+\end{align*}
+
+
+Thus, the Legendre sequence for $p = 11$ is:
+
+\begin{align*}
+    &\{0, \left(\frac{1}{11}\right), \left(\frac{2}{11}\right), \left(\frac{3}{11}\right), \left(\frac{4}{11}\right), \left(\frac{5}{11}\right), \left(\frac{6}{11}\right), \left(\frac{7}{11}\right), \left(\frac{8}{11}\right), \left(\frac{9}{11}\right), \left(\frac{10}{11}\right)\} \\
+    =& \{0, 1, -1, 1, 1, 1, -1, -1, -1, 1, -1\} \qquad \square
+\end{align*}
 
 \section*{(5)}
 
+\subsection*{(a)}
+
+We're given:
+
+\begin{align*}
+    y[n] = x[n] + 0.4x[n-20] + 0.2x[n-30]
+\end{align*}
+
+And need to find $p[n]$ s.t. $y[n] = x[n] * p[n]$
+\bigskip
+
+It is trivial that:
+
+\begin{align*}
+    p[n] = \delta[n] + 0.4\delta[n-20] + 0.2\delta[n-30] \qquad \square
+\end{align*}
+
+\subsection*{(b)}
+
+% From the process in lecture slide p.194, we knew that we can get $P(Z)$ by:
+
+% \begin{align*}
+%     P(Z) = 1 + \alpha Z^{-N_p}
+% \end{align*}
+
+% Thus, in our case we have:
+
+% \begin{align*}
+%     P(Z) = 1 + 0.4Z^{-20} + 0.2Z^{-30}
+% \end{align*}
+
+% Taking $\log$ to get $\hat{P}(Z)$:
+
+% \begin{align*}
+%     \hat{P}(Z) = \log(1 + 0.4Z^{-20} + 0.2Z^{-30})
+% \end{align*}
+
+% Then calculating the inverse Z-transform of $\hat{P}(Z)$:
+
+% \begin{align*}
+%     \hat{p}[n] 
+%     &= \sum_{k=1}^\infty (-1)^{k+1} \frac{\alpha^k}{k} \delta(n - k \cdot N_p) \\
+%     &= \sum_{k=1}^\infty (-1)^{k+1} \frac{0.4^k}{k} \delta(n - 20k) + \sum_{k=1}^\infty (-1)^{k+1} \frac{0.2^k}{k} \delta(n - 30k)
+% \end{align*}
+
+The lifter is designed to set to $0$ when $n$ is a multiple of $N_p = 20$ or $30$, 
+and set to $1$ otherwise.
+\bigskip
+
+Thus, we can design the lifter as:
+
+\begin{align*}
+    l[n] = \begin{cases}
+        0 & \text{if } n = 20k \text{ or } 30k \text{ for any } k = 1, 2, 3, \cdots \\
+        1 & \text{otherwise}
+    \end{cases} \qquad \square
+\end{align*}
+
+
 \section*{(6)}
+
+\subsection*{(a)}
+
+It is possible for human to hear voice with freqeuncy $19Hz$.
+\bigskip
+
+Even though in theory, the frequency that human can hear is between $20Hz$ and $20000Hz$,
+by the lower bound of hearing graph in lecture slide p.238, if the sound intensity ($P$) is high enough,
+then it is possible for human to hear.
+
+\subsection*{(b)}
+
+When we're splitting a signal into segments, where each segment present a word, 
+we are using the property that consonants have smaller energy than vowels, 
+so we can distinguish each word by finding the parts with smaller amplitude.
+(This can be seen at p.248 of the lecture note.)
+\bigskip
+
+However, for some words with \underline{double vowels}, or there is \underline{no consonant} in the word, 
+we can not split the signal by this approach.
+
+\subsection*{(c)}
+
+A music signal always has a the chord phenomenon because music signal is generated by resonance, 
+for example, brass instruments generate sound by the vibration of a resonator.
+\bigskip
+
+Any sound that is generated by resonance has the effect that at freqeuncy values:
+
+\begin{align*}
+    f = k \cdot f_0 \qquad k \in \mathbb{Z}^+
+\end{align*}
+
+The amplitude of the signal is larger, which is the chord phenomenon.
 
 \section*{(7)}
 
-\section*{Extra problems}
+\subsection*{(a)}
+
+\subsection*{(b)}
+
+The first reason why the compression ratio of an image can be higher than an audio signal because image is of dimension $2D$,
+while audio signal is of dimension $1D$, this causes the redundancy of image to be higher than audio signal.
+\bigskip
+
+For example, in an image, if there is a pixel of white color, then it is likely that the pixels surrounding it are also white,
+and this does not happen only when the pixel is at the edge of an object. This example shows the property of \underline{consistency in space domain}.
+\bigskip
+
+Another reason is also due to \underline{consistency} but in the \underline{frequency domain}, 
+if we use intensity to represent amplitude, images tend to concentrate on low-frequency components, 
+thus, the information that needed to be stored is less.
+
+\subsection*{(c)}
+
+
+
+\section*{Extra problem}
 
 \end{document}

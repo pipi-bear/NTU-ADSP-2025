@@ -32,3 +32,10 @@ However, the notes for p.81-151 are already written in `ADSP_Write2.pdf`, so:
 
 $\rightarrow$ check `ADSP_Write2.pdf` if you need the notes for p.81-151   
 $\rightarrow$ check `ADSP_Write2_updated_version.pdf` if you need the notes for p.152-180
+
+### Two versions of ADSP_Write3.pdf
+
+Similar to `ADSP_Write2.pdf`, I first wrote notes on the older version of lecture slides `ADSP_Write3.pdf`, which only contains pages p.181-195, so:
+
+$\rightarrow$ check `ADSP_Write3.pdf` if you need the notes for p.181-195 
+$\rightarrow$ check `ADSP_Write3_updated_version.pdf` if you need the notes for p.196-273
