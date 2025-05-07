@@ -11,6 +11,7 @@
 \usepackage[thinc]{esdiff}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{float}
+\usepackage{listings}
 \graphicspath{ {./HW3_img/} }
 
 \title{ADSP: HW3}
@@ -23,6 +24,15 @@
 \maketitle 
 
 \section*{(1)}
+
+In addition to the basic requirements, I also added the following features:
+\begin{itemize}
+    \item \underline{bpm} (we use the \lstinline{scale_beat_by_bpm} function to scale the beat durations according to the desired BPM)
+    \item \underline{octave} (we can use the \lstinline{octave} list to set the octave of each note, so for example, we can have different pitches for "Do" in different octaves)
+    \item \underline{rest, note duration} (we can use the \lstinline{beat} list to set the duration of each note, including setting $0$ to present a rest)
+\end{itemize}
+
+To check the details of the latter two features, please refer to the \lstinline{getmusic} function in the \lstinline{HW3_1.py} file.
 
 \section*{(2)}
 
@@ -193,7 +203,100 @@ We're given:
     M = 11, \ \alpha = 8 + 6i, \ N = 12
 \end{align*}
 
-Since $N$ has factors: $d \in \{1, 2, 3, 4, 6, 12\}$, we can define:
+Since we're asked to find CNT of $x$, which is defined as:
+
+\begin{align*}
+    F(x)k = \sum_{n=0}^{11} x[n] \cdot \alpha^{kn} \modwos{11} \quad \text{for } k \in \{0, 1, \dots, 11\}
+\end{align*}
+
+And we define the CNT matrix $F$ (which is a $12 \times 12$ matrix) as:
+
+\begin{align*}
+    F_{k,n} = \alpha^{kn} \modwos{11} \quad \text{for } k, n \in \{0, 1, \dots, 11\}
+\end{align*}
+
+Let $p_j = \alpha^j \modwos{11}$ for $j = 0, 1, \dots, 11$, we have:
+
+\begin{align*}
+    p_0 &= 1 + 0i \\
+    p_1 &= 8 + 6i \\
+    p_2 &= 6 + 8i \\
+    p_3 &= 0 + 1i \\
+    p_4 &= 5 + 8i \\
+    p_5 &= 3 + 6i \\
+    p_6 &= 10 + 0i \\
+    p_7 &= 3 + 5i \\
+    p_8 &= 5 + 3i \\
+    p_9 &= 0 + 10i \\
+    p_{10} &= 6 + 3i \\
+    p_{11} &= 8 + 5i \\
+\end{align*}
+
+And we can get:
+
+\begin{align*}
+    F =
+    \begin{bmatrix}
+        p_0 & p_0 & p_0 & \cdots & p_0 \\
+        p_1 & p_2 & p_3 & \cdots & p_{11} \\
+        p_2 & p_4 & p_6 & \cdots & p_{10} \\
+        \vdots & \vdots & \vdots & & \vdots \\
+        p_{11} & p_{10} & p_9 & \cdots & p_1
+    \end{bmatrix}
+\end{align*}
+
+From $x$, we can see that:
+
+\begin{align*}
+    x[1] = x[5] = x[7] = x[11] = 1, \quad \text{and all other values are zero}
+\end{align*}
+
+So:
+
+\begin{align*}
+    F(x)_k 
+    &= F_{k,1} + F_{k,5} + F_{k,7} + F_{k,11} \\
+    &= \alpha^{k \cdot 1} + \alpha^{k \cdot 5} + \alpha^{k \cdot 7} + \alpha^{k \cdot 11} \modwos{11}
+\end{align*}
+
+Thus, the resulting vector is:
+
+\begin{align*}
+    Fx =
+    \begin{bmatrix}
+        4 \\
+        0 \\
+        2 \\
+        0 \\
+        9 \\
+        0 \\
+        7 \\
+        0 \\
+        9 \\
+        0 \\
+        2 \\
+        0
+    \end{bmatrix}
+    \equiv
+    \begin{bmatrix}
+        4 \\
+        0 \\
+        2 \\
+        0 \\
+        -2 \\
+        0 \\
+        -4 \\
+        0 \\
+        -2 \\
+        0 \\
+        2 \\
+        0
+    \end{bmatrix}
+    \pmod{11} \qquad \square
+\end{align*}
+
+
+
 
 \section*{(4)}
 
@@ -352,6 +455,8 @@ The amplitude of the signal is larger, which is the chord phenomenon.
 
 \subsection*{(a)}
 
+We can use \underline{entropy} to measure uniformity.
+
 \subsection*{(b)}
 
 The first reason why the compression ratio of an image can be higher than an audio signal because image is of dimension $2D$,
@@ -368,8 +473,14 @@ thus, the information that needed to be stored is less.
 
 \subsection*{(c)}
 
+\begin{enumerate}
+    \item After transformation and quantization, we can compress symbols by Huffman coding, and this approach is adopted in MP3.
+    \item Adaptive Differential Pulse Code Modulation (ADPCM), which uses the fact that neighboring audio samples are often similar to each others (exploit consistency).
+    \item MPEG audio compression, which uses masking based on the fact that when there is a strong audio signal, the weaker signal in its neighborhood is more likely imperceptible.
+\end{enumerate}
 
+\section*{Extra problem (ID ends with $1, 6$)}
 
-\section*{Extra problem}
+The frequency of a consonant is higher than that of a vowel.
 
 \end{document}
