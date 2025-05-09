@@ -39,3 +39,27 @@ plt.tight_layout()
 Some of the solutions in `ADSP_HW2_sol` mentioned that I've used the contents from ppt, like you may see "from ppt p.***".
 
 The ppt resources can be found in the subdirectory `Lecture_notes`, you can download them if needed :)
+
+# Score
+
+I got $10.44$ out of $12$ in this assignment. The scores for each problem and the mistakes given by the TA are shown below:
+
+(1) 16
+圖形有誤，講義p. 115有關transition band的部分，係將原本Hd的值乘上大於0小於1的值，例如講義所寫的乘上0.7與0.2，而因為transition band的位置是在訊號邊緣附近，因此有可能會出現一邊要用F，另一邊要用(F-1)，因此在line 18-26的迴圈中，應先將值算出後再做transition band
+(2) 20
+(3) 5
+(4) 10
+(5) 10
+(6) 16
+(a) (z-2)沒有約分
+(b)
+H(z) = (2z³ - 2z² - 3z - 2) / (z² - 0.7z + 1)
+= 2[z - (-1+j)/2][z - (-1-j)/2](z - 2) / (z - 0.2)(z - 0.5)
+依照講義 p. 186 - 188 的作法
+Ĥ(z) = log (H(z)) 
+= log 2 + log [z - (-1+j)/2] + log [z - (-1-j)/2] + log (z - 2) - log(z - 0.2) - log(z - 0.5)
+= log 2 + log [1 - (-1+j)/2 z⁻¹] + log [1 - (-1-j)/2 z⁻¹] + log [-2(1 - ½ z)] - log(1 - 0.2 z⁻¹) - log(1 - 0.5 z⁻¹) 
+= log (-4) + [-(-1-j)/2]ⁿ/n]z⁻ⁿ + [-[(-1+j)/2]ⁿ/n]z⁻ⁿ + (½)⁻ⁿ/n zⁿ  - (-0.2ⁿ/n)z⁻ⁿ - (-0.5ⁿ/n)z⁻ⁿ
+log(-4), n = 0
+(7) 10
+(Bonus) +1
