@@ -5,12 +5,18 @@ D.M. Burton.
 \newblock {\em Elementary Number Theory}.
 \newblock Tata McGraw-Hill Publishing Company Limited, 2006.
 
+\bibitem{ideal_quotientring}
+E.V. Flynn.
+\newblock Rings \& arithmetic 3: Ideals and quotient rings.
+\newblock Lecture notes, University of Oxford, 2005.
+\newblock Lectures for Part A of Oxford FHS in Mathematics and Joint Schools.
+
 \bibitem{algebra}
 W.~Keith Nicholson.
 \newblock {\em Introduction to Abstract Algebra}.
 \newblock Wiley Publishing, 4th edition, 2012.
 
-\bibitem{satriawan2024}
+\bibitem{beginner_guide}
 Ardianto Satriawan, Rella Mareta, and Hanho Lee.
 \newblock A complete beginner guide to the number theoretic transform (ntt),
   2024.

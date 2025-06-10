@@ -4,7 +4,7 @@
 \usepackage{hyperref} % For hyperlinks
 \usepackage{geometry} % For page margins
 \usepackage{graphicx} % For including images
-\usepackage{amsmath} % For math equations
+\usepackage{amsmath} % For math equation*s
 \usepackage{amssymb} % For math symbols
 \usepackage{amsthm} % For theorem environments
 \usepackage{amsfonts} % For math fonts
@@ -20,6 +20,15 @@
     skipabove=\baselineskip,
     skipbelow=\baselineskip
 ]{definition}
+
+\newtheorem{proposition}{Proposition}[section]
+\surroundwithmdframed[
+    linewidth=0.5pt,
+    innertopmargin=5pt,
+    innerbottommargin=5pt,
+    skipabove=\baselineskip,
+    skipbelow=\baselineskip
+]{proposition}
 
 \geometry{
     a4paper,
@@ -90,12 +99,13 @@ so that we can move beyond the theoretical part, gaining a full picture of the c
 \subsection{Report Structure}
 
 \section{Preliminaries: Mathematical Foundations of the Number Theoretic Transform}
-\subsection{Notations and Definitions}
 
-To unify the notations and definitions, in this report, we assume that if
-given two polynomials $G(x)$ and $H(x)$, then they are of degree $n-1$ if not specified.
+% \subsection{Notations and Definitions}
 
-\subsection{Rings}
+% To unify the notations and definitions, in this report, we assume that if
+% given two polynomials $G(x)$ and $H(x)$, then they are of degree $n-1$ if not specified.
+
+\subsection{Rings and quotient rings}
 
 To properly define primitive roots and illustrate the structure of the Number Theoretic Transform (NTT), 
 it is necessary to first introduce the concepts of rings, ideals, and quotient rings. 
@@ -151,10 +161,53 @@ a quotient ring $R/A$ is formed by grouping elements of the ring $R$ into disjoi
 where each coset has the form $r + A = \{r + a \mid r \in R\}$. 
 These cosets partition the ring in a way that reflects the structure of the ideal $A$.
 
-The quotient rings and 
-we treat every element in the same coset as "equivalent", just like in modular arithmetic. 
-For example, in the integers, $\mathbb{Z}/n\mathbb{Z}$ represents the ring of integers modulo $n$, where all numbers differing by a multiple of $n$ are considered the same. 
+One may wonder why quotient rings are introduced in the literature of NTT.
+The idea is that, we treat every element in the same coset as "equivalent", just like in modular arithmetic. 
+
+An important example would be $\mathbb{Z}/n\mathbb{Z}$, which represents the ring of integers modulo $n$, 
+where all numbers differed by a multiple of $n$ are considered the same. 
 In the same way, a quotient ring allows us to "mod out" an ideal $A$ and treat every element in $A$ as zero, simplifying the structure of the ring and allowing new algebraic manipulations.
+
+To illustrate what this means, 
+we can consider the following example:
+
+If given $R = \mathbb{Z}$ and $A = 2\mathbb{Z}$, 
+which means that we have the ring of integers and ideal of even numbers, respectively.
+Then $R/A = \mathbb{Z}/2\mathbb{Z}$ would be defined as having the set:
+
+\begin{equation*}
+    \{r + 2\mathbb{Z} \mid r \in \mathbb{Z}\}
+\end{equation*}
+
+Some of its cosets would be:
+
+\begin{align*}
+    \{1 + 2\mathbb{Z}\} &= \{1, 3, 5, 7, \ldots\} \\
+    \{2 + 2\mathbb{Z}\} &= \{2, 4, 6, 8, \ldots\} \\
+    \{3 + 2\mathbb{Z}\} &= \{3, 5, 7, 9, \ldots\} \\
+    \vdots
+\end{align*}
+
+However, we can see that $\{1 + 2\mathbb{Z}\}$ and $\{3 + 2\mathbb{Z}\}$ are the same, 
+thus there would actually be only two cosets:
+
+\begin{align*}
+    \{0 + 2\mathbb{Z}\} &= \{0, 2, 4, 6, \ldots\} \\
+    \{1 + 2\mathbb{Z}\} &= \{1, 3, 5, 7, \ldots\} 
+\end{align*}
+
+Thus, if we have two elements $r_1$ and $r_2$ in the same coset, say $0 + 2\mathbb{Z}$, 
+then we can write:
+
+\begin{align*}
+    r_1 = 0 + 2 z_1 \quad \text{for some } z_1 \in \mathbb{Z} \\
+    r_2 = 0 + 2 z_2 \quad \text{for some } z_2 \in \mathbb{Z}
+\end{align*}
+
+and we can see that $r_1 \equiv r_2 \pmod{2\mathbb{Z}}$ since $r_1 - r_2 = 2(z_1 - z_2) \in 2\mathbb{Z}$.
+This can also be written as $r_1 - r_2 \equiv 0 \pmod{2\mathbb{Z}}$, and $r_1 - r_2 \in 2\mathbb{Z}$. 
+What this means is that, for any element in the ideal $2\mathbb{Z}$, 
+it would be treated as equivalent to $0$ in the quotient ring $\mathbb{Z}/2\mathbb{Z}$.
 
 \subsection{Modular Arithmetic and Roots of Unity}
 
@@ -168,9 +221,9 @@ which we would talk about the details in the next subsection.
 \begin{definition}[Residue Class Modulo $n$, \cite{algebra}, p.~30]
     If $a$ is an integer, its equivalent class $[a]$ with respect to congruence modulo $n$ is called its \textbf{residue class modulo $n$}, 
     and we write $\overline{a} = [a]$ for convenience: 
-    \begin{equation}
+    \begin{equation*}
     \overline{a} = [a] = \{x \in \mathbb{Z} \mid x \equiv a \pmod{n}\}.
-    \end{equation}
+    \end{equation*}
 \end{definition}
 
 Intuitively saying, after we selected an integer $n$ to be the modulus, 
@@ -185,9 +238,9 @@ which is defined as follows:
 
 \begin{definition}[Integers Modulo $n$, \cite{algebra}, p.~30]
     The set of all residue classes modulo $n$ is denoted 
-    \begin{equation}
+    \begin{equation*}
     \mathbb{Z}_n = \{\overline{0}, \overline{1}, \overline{2}, \ldots, \overline{n - 1}\}.
-    \end{equation}
+    \end{equation*}
     and is called the set of \textbf{integers modulo $n$}.
 \end{definition}
 
@@ -197,9 +250,9 @@ we first define the order of an integer modulo $n$ as follows:
 \begin{definition}[Order of an Integer Modulo $n$ , \cite{number_theory}, p.~147]
     Let $n > 1$ and $\gcd(a, n) = 1$. 
     The \textbf{order of $a$ modulo $n$} is the smallest positive integer $k$ such that
-    \begin{equation}
+    \begin{equation*}
     a^k \equiv 1 \pmod{n}.
-    \end{equation}
+    \end{equation*}
 \end{definition}
 
 Using the definition of order, we can then define the primitive root as follows:
@@ -208,9 +261,9 @@ Using the definition of order, we can then define the primitive root as follows:
     If $\gcd(a, n) = 1$ and $a$ is of order $\varphi(n)$ modulo $n$, 
     then $a$ is called a \textbf{primitive root} of the integer $n$.
     Equivalently, $a$ is a primitive root modulo $n$ if
-    \begin{equation}
+    \begin{equation*}
     a^{\varphi(n)} \equiv 1 \pmod{n} \quad \text{but} \quad a^k \not\equiv 1 \pmod{n} \quad \forall \ 1 \leq k < \varphi(n).
-    \end{equation}
+    \end{equation*}
 \end{definition}
 
 Note that the primitive root may not be unique, and since we use the primitive root to construct the NTT matrix, 
@@ -222,9 +275,9 @@ In the context of NTT, we choose the modulus $n$ to be a prime number, let it be
 and under the assumption that our polynomials $G(x)$ and $H(x)$ are of degree $n-1$, 
 we try to find primitive roots $\omega$ that would satisfy:
 
-\begin{equation}
+\begin{equation*}
     \omega^n \equiv 1 \pmod{q} \quad \text{and} \quad \omega^k \not\equiv 1 \pmod{q} \quad \forall \ 1 \leq k < n.
-\end{equation}
+\end{equation*}
 
 Which means that if we're trying to do convolution of polynomials of degree $3$, 
 then we should find a primitive root that would be congruent to $1$ when raised to the power of $4$, 
@@ -233,9 +286,177 @@ under some choice of modulus $q$.
 And such $\omega$ is called the \textbf{primitive $n$-th root of unity} in the ring $\mathbb{Z}_q$.
 \cite[p.~4]{beginner_guide}
 
-\subsection{NTT: Discrete Fourier Transform over Finite Fields}
+\subsection{Cyclotomic Polynomials}
 
-\subsection{Forward and Inverse NTT Algorithms}
+From the previous subsections, we have already defined the quotient ring and the primitive root.
+We then introduce the concept of cyclotomic polynomials, 
+which is chosen to construct the ideal of the quotient ring.
+\cite[p.~3]{survey}
+
+\begin{definition}[Cyclotomic Polynomial, \cite{cyclotomic}, p.~11]
+    The $n$-th \textbf{cyclotomic polynomial} $\Phi_n(x)$ is defined by
+    \begin{equation*}
+        \Phi_n(x) = \prod_{\omega \in P(n)} (x - \omega)
+    \end{equation*}
+    where $P(n)$ denotes the set of all primitive $n$-th roots of unity.
+\end{definition}
+
+But how do we connect the $n$-th cyclotomic polynomial to construct the ideal of the quotient ring?
+To answer this question, we first introduce our focus, 
+the two widely used rings in lattice-based schemes are:
+
+\begin{equation*}
+    \mathbb{Z}_q[x] / (x^n - 1) \quad \text{and} \quad \mathbb{Z}_q[x] / (x^n + 1)
+\end{equation*}
+\cite[p.~3]{survey}
+
+Here we could see that the ideals of the quotient rings are $(x^n - 1)$ and $(x^n + 1)$, respectively.
+To construct these two ideals, we need the following proposition:
+
+\begin{proposition}[Fundamental Relation, \cite{cyclotomic}, p.~12]
+    For any positive integer $n$, 
+    \begin{equation*}
+        x^n - 1 = \prod_{d \mid n} \Phi_d(x)
+    \end{equation*}
+\end{proposition}
+
+The above proposition shows that, if we are to choose the ideal with the form $(x^n - 1)$, 
+then we could construct it by finding all the factors $d$ that could divide $n$, 
+then multiply all the $d$-th cyclotomic polynomials together.
+
+To see how this works, we can consider the example of having $n = 4$, 
+with the aid of the following table:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Final_img/cyclotomic_table.png}
+    \caption{Cyclotomic Table. Source: \cite[p.~11]{cyclotomic}}
+    \label{fig:cyclotomic_table}
+\end{figure}
+
+We can see that, for $n = 4$, 
+the factors of $n$ are $1, 2, 4$, 
+and the corresponding cyclotomic polynomials are:
+
+\begin{align*}
+    \Phi_1(x) &= x - 1 \\
+    \Phi_2(x) &= x + 1 \\
+    \Phi_4(x) &= x^2 + 1
+\end{align*}
+
+According to the fundamental relation, we have:
+
+\begin{align*}
+    x^4 - 1 
+    &= \prod_{d \mid 4} \Phi_d(x) \\
+    &= \Phi_1(x) \Phi_2(x) \Phi_4(x) \\
+    &= (x - 1)(x + 1)(x^2 + 1) \\
+    &= (x^2 - 1)(x^2 + 1) \\
+    &= x^4 - 1
+\end{align*}
+
+which matches the result in the table.
+
+This could easily be generalized to the case when we choose the ideal with the form $(x^n + 1)$.
+Observe that:
+
+\begin{equation*}
+    x^{2n} + 1 = (x^n + 1)(x^n - 1)
+\end{equation*}
+
+So we have:
+
+\begin{equation*}
+    x^n + 1 = \frac{x^{2n} + 1}{x^n - 1}
+\end{equation*}
+
+Using the proposition of the fundamental relation, we have:
+
+\begin{align*}
+    x^{2n} - 1 &= \prod_{d \mid 2n} \Phi_d(x) \\
+    x^n - 1 &= \prod_{d \mid n} \Phi_d(x) 
+\end{align*}
+
+Therefore, we can rewrite the above equation* as:
+
+\begin{equation*}
+    x^n + 1 
+    = \frac{x^{2n} + 1}{x^n - 1} 
+    = \frac{\prod_{d \mid 2n} \Phi_d(x)}{\prod_{d \mid n} \Phi_d(x)}
+    = \prod_{d \nmid n, \ d \mid 2n} \Phi_d(x)
+\end{equation*}
+
+This means that, if we are to choose the ideal with the form $(x^n + 1)$, 
+then we could construct it by finding all the factors $d$ that could divide $2n$ but not $n$, 
+then multiply all the $d$-th cyclotomic polynomials together.
+
+In particular, if $n$ is of the special form:
+
+\begin{equation*}
+    n = 2^k \qquad \text{for some } k \in \mathbb{N}
+\end{equation*}
+
+then we have:
+
+\begin{equation*}
+    x^{2^k} + 1 
+    = \prod_{d \nmid 2^k, \ d \mid 2^{k+1}} \Phi_d(x)
+    = \Phi_{2^{k+1}}(x)
+    = \Phi_{2n}(x)
+\end{equation*}
+
+Therefore, we arrived at the conclusion that, 
+if we are to choose the ideal with the form $(x^n + 1)$ with $n = 2^k, \quad k \in \mathbb{N}$, 
+then we could construct it by finding the $2n$-th cyclotomic polynomial $\Phi_{2n}(x)$.
+
+This property is quite useful, so in the context of PQC, 
+the chosen ring is mostly $\mathbb{Z}_q[x] / (x^n + 1)$ instead of $\mathbb{Z}_q[x] / (x^n - 1)$.
+\cite[p.~8]{beginner_guide} 
+And we further denote the $2n$-th root of unity as $\psi$, 
+with the detailed definition shown below:
+
+\begin{definition}[$2n$-th Root of Unity, \cite{beginner_guide}, p.~8]
+    Let $\mathbb{Z}_q$ be an integer ring modulo $q$, and $n - 1$ is the polynomial degree of $G(x)$ and $H(x)$
+    and $\omega$ is the primitive $n$-th root of unity. 
+    Define $\psi$ as the \textbf{primitive $2n$-th root of unity} 
+    \begin{equation*}
+        \iff \psi^2 \equiv \omega \pmod{q} \quad \text{and} \quad \psi^n \equiv -1 \pmod{q}
+    \end{equation*}
+\end{definition}
+
+With all of these defined, we can then move on to the next section, 
+where the definition of the Number Theoretic Transform (NTT) would be introduced based on the above definitions.
+
+\section{The Number Theoretic Transform (NTT)}
+
+\subsection{Definition of Forward and Inverse NTT}
+
+In the previous subsection, 
+we introduced the formulation of the two widely used quotient rings in lattice-based schemes, 
+if we focus on the case that the ideal is chosen to be of the form $(x^n + 1)$, 
+we then denote them by $R$ and $R_q$, respectively:
+
+\begin{align*}
+    R = \mathbb{Z}[x] / (x^n + 1) \quad \text{and} \quad R_q = \mathbb{Z}_q[x] / (x^n + 1)
+\end{align*}
+
+Assume the special case where $n = 2^k$, 
+and consider $\omega$ to be a primitive $n$-th root of unity in $\mathbb{Z}_q$
+which
+
+\begin{equation*}
+    \omega^n \equiv 1 \pmod{q} \quad \text{where} \quad q \equiv 1 \pmod{2n}, \ q: \text{prime} 
+\end{equation*}
+
+we could define the NTT of a polynomial $G(x) \in R_q$ as:
+
+\begin{equation*}
+    \hat{G} = \mathbf{NTT}(G(x)) = \sum_{i = 0}^{n - 1} G[i] \omega^{i j} \pmod{q}
+\end{equation*}
+
+where $\mathbf{NTT}_q$ is the NTT operator in the ring $\mathbb{Z}_q$.
+
+
 
 \subsection{Types of Convolutions and Equivalent NTTs}
 
