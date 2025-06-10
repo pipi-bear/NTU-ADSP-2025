@@ -1,15 +1,37 @@
 \begin{thebibliography}{1}
 
+\bibitem{fpga}
+Kasra Ahmadi, Saeed Aghapour, Mehran~Mozaffari Kermani, and Reza Azarderakhsh.
+\newblock Efficient algorithm level error detection for number-theoretic
+  transform used for kyber assessed on fpgas and arm, 2024.
+
+\bibitem{cyclotomic}
+James Belk.
+\newblock Fields and cyclotomic polynomials.
+\newblock Lecture notes, Cornell University, n.d.
+\newblock Last accessed 10 June 2025.
+
 \bibitem{number_theory}
 D.M. Burton.
 \newblock {\em Elementary Number Theory}.
 \newblock Tata McGraw-Hill Publishing Company Limited, 2006.
+
+\bibitem{ADSP5}
+JianJiun Ding.
+\newblock Ix. basic implementation techniques and fast algorithm.
+\newblock Lecture notes, National Taiwan University, 2025.
+\newblock Last accessed 10 June 2025.
 
 \bibitem{ideal_quotientring}
 E.V. Flynn.
 \newblock Rings \& arithmetic 3: Ideals and quotient rings.
 \newblock Lecture notes, University of Oxford, 2005.
 \newblock Lectures for Part A of Oxford FHS in Mathematics and Joint Schools.
+
+\bibitem{survey}
+Zhichuang Liang and Yunlei Zhao.
+\newblock Number theoretic transform and its applications in lattice-based
+  cryptosystems: A survey, 2022.
 
 \bibitem{algebra}
 W.~Keith Nicholson.

@@ -100,11 +100,6 @@ so that we can move beyond the theoretical part, gaining a full picture of the c
 
 \section{Preliminaries: Mathematical Foundations of the Number Theoretic Transform}
 
-% \subsection{Notations and Definitions}
-
-% To unify the notations and definitions, in this report, we assume that if
-% given two polynomials $G(x)$ and $H(x)$, then they are of degree $n-1$ if not specified.
-
 \subsection{Rings and quotient rings}
 
 To properly define primitive roots and illustrate the structure of the Number Theoretic Transform (NTT), 
@@ -427,6 +422,26 @@ with the detailed definition shown below:
 With all of these defined, we can then move on to the next section, 
 where the definition of the Number Theoretic Transform (NTT) would be introduced based on the above definitions.
 
+\subsection{Notations}
+
+Some of the notations vary across the referenced literature, 
+and are modified to maintin the consistency of the notations. 
+
+In this report, we assume that the two given polynomials $G(x)$ and $H(x)$ to be multiplied / convolved, 
+are of degree $n-1$ if not specified, which can be written as:
+
+\begin{equation*}
+    G(x) = \sum_{i = 0}^{n - 1} G[i] x^i \quad \text{and} \quad H(x) = \sum_{i = 0}^{n - 1} H[i] x^i
+\end{equation*}
+
+This can also be represented in the form of a vector:
+
+\begin{equation*}
+    G = (G[0], G[1], \ldots, G[n - 1]) \quad \text{and} \quad H = (H[0], H[1], \ldots, H[n - 1])
+\end{equation*}
+
+Other notations follow the same convention as in the preliminaries above.
+
 \section{The Number Theoretic Transform (NTT)}
 
 \subsection{Definition of Forward and Inverse NTT}
@@ -445,22 +460,159 @@ and consider $\omega$ to be a primitive $n$-th root of unity in $\mathbb{Z}_q$
 which
 
 \begin{equation*}
-    \omega^n \equiv 1 \pmod{q} \quad \text{where} \quad q \equiv 1 \pmod{2n}, \ q: \text{prime} 
+    \omega^n \equiv 1 \pmod{q} \quad \text{where} \quad q \equiv 1 \pmod{2n}, \ q: \text{prime}, \ n: 2^k 
 \end{equation*}
 
 we could define the NTT of a polynomial $G(x) \in R_q$ as:
 
 \begin{equation*}
-    \hat{G} = \mathbf{NTT}(G(x)) = \sum_{i = 0}^{n - 1} G[i] \omega^{i j} \pmod{q}
+    \hat{G} = \mathbf{NTT}(G(x)) = \sum_{j = 0}^{n - 1} G[j] \omega^{i j} \pmod{q}
 \end{equation*}
 
-where $\mathbf{NTT}_q$ is the NTT operator in the ring $\mathbb{Z}_q$.
+Representing in the matrix multiplication form, we have:
 
+\begin{equation*}
+    \hat{G} 
+    = \mathbf{NTT}(G(x)) 
+    = \begin{bmatrix}
+        \omega^0 & \omega^0 & \cdots & \omega^0 \\
+        \omega^0 & \omega^1 & \cdots & \omega^{n-1} \\
+        \omega^0 & \omega^2 & \cdots & \omega^{2(n-1)} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        \omega^0 & \omega^{n-1} & \cdots & \omega^{(n-1)(n-1)}
+    \end{bmatrix}
+    \begin{bmatrix}
+        G[0] \\
+        G[1] \\
+        \vdots \\
+        G[n-1]
+    \end{bmatrix}
+\end{equation*}
 
+Note that we previously defined the primitive $2n$-th root of unity $\psi$, 
+which satisfies $\psi^2 \equiv \omega \pmod{q}$, hence, 
+by plugging $\psi$ into the equation and the matrix above, 
+we have:
+
+\begin{equation*}
+    \hat{G} = \mathbf{NTT}(G(x)) = \sum_{j = 0}^{n - 1} G[j] \psi^{2 i j} \pmod{q}
+\end{equation*}
+
+and the matrix form:
+
+\begin{equation*}
+    \hat{G} 
+    = \mathbf{NTT}(G(x)) 
+    = \begin{bmatrix}
+        (\psi^2)^0 & (\psi^2)^0 & \cdots & (\psi^2)^0 \\
+        (\psi^2)^0 & (\psi^2)^1 & \cdots & (\psi^2)^{n-1} \\
+        (\psi^2)^0 & (\psi^2)^2 & \cdots & (\psi^2)^{2(n-1)} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        (\psi^2)^0 & (\psi^2)^{n-1} & \cdots & (\psi^2)^{(n-1)(n-1)}
+    \end{bmatrix}
+    \begin{bmatrix}
+        G[0] \\
+        G[1] \\
+        \vdots \\
+        G[n-1]
+    \end{bmatrix}
+\end{equation*}
+
+And the inverse NTT of $\hat{G}$ is denoted as $\mathbf{NTT^{-1}}(\hat{G})$, 
+and defined as:
+
+\begin{equation*}
+    G = \mathbf{NTT^{-1}}(\hat{G}) = \sum_{j = 0}^{n - 1} n^{-1} \hat{G}[j] \omega^{-i j} \pmod{q}
+\end{equation*}
+\cite[p.~4]{fpga}
+
+\subsection{Comparison with Fast Fourier Transform (FFT)}
+
+% Consider a periodic sequence $x[n]$ with period $N$ and with the Fourier series representation:
+
+% \begin{equation*}
+%     x[n] = \sum_{k = \langle N \rangle} a_k e^{j \frac{2 \pi}{N} k n}
+% \end{equation*}
+
+% Suppose we choose the interval of summation above to be $k = 0, 1, \ldots, N - 1$, 
+% then we have:
+
+% \begin{equation*}
+%     x[n] = a_0 + a_1 e^{j \frac{2 \pi}{N} n} + a_2 e^{j \frac{2 \pi}{N} 2 n} + \cdots + a_{N-1} e^{j \frac{2 \pi}{N} (N-1) n}
+% \end{equation*}
+
+From the Cooley-Tukey algorithm \cite[p.~370]{ADSP5}, 
+we recall that the DFT of a sequence $x[n]$ of length $N = 2^k$ is given by:
+
+\begin{align*}
+    X[m] 
+    &= \sum_{n = 0}^{N - 1} x[n] e^{-j \frac{2 \pi m n}{N}} \\
+    &= \sum_{n = 0}^{N/2 - 1} x[2n] e^{-j \frac{2 \pi m (2n)}{N}} + \sum_{n = 0}^{N/2 - 1} x[2n + 1] e^{-j \frac{2 \pi m (2n + 1)}{N}} \\
+    &= \sum_{n = 0}^{N/2 - 1} x[2n] e^{-j \frac{2 \pi m n}{N/2}} + \underbrace{e^{-j \frac{2 \pi m}{N}}}_{\text{twiddle factors}} \sum_{n = 0}^{N/2 - 1} x[2n + 1] e^{-j \frac{2 \pi m n}{N/2}} 
+\end{align*}
+
+where the second equality is by splitting the summation into two parts, 
+one for the even-indexed terms and the other for the odd-indexed terms, 
+then they could further be derived into two $\frac{N}{2}$-point DFTs, with twiddle factor $e^{-j \frac{2 \pi m}{N}}$.
+
+Since NTT is DFT in another ring, we could also apply similar techniques as in the Cooley-Tukey algorithm to optimize NTT, 
+making the original complexity of NTT from $O(n^2)$ to $O(n \log n)$. 
+This is achieved by utilizing the two properties of the primitive $2n$-th root of unity $\psi$ \cite[p.~11]{beginner_guide}:
+
+\begin{align*}
+    \text{periodicity:}& \quad \psi^{k + 2n} = \psi^k \\
+    \text{symmetry:}& \quad \psi^{k + n} = -\psi^k \qquad \text{where } k \in \mathbb{Z}^+
+\end{align*}
+
+By these properties, 
+we could divide the calculation of $n$-point NTT and INTT into two $\frac{n}{2}$-point NTT and INTT, 
+similar to what we have done in the DFT case as below:
+
+\begin{align*}
+    \hat{G} 
+    &= \mathbf{NTT}(G(x)) \\
+    &= \sum_{j = 0}^{n - 1} G[j] \psi^{2 i j} \pmod{q} \\
+\end{align*}
+
+Split the summation into even and odd indices:
+
+\begin{align*}
+    \hat{G} 
+    &= \sum_{j = 0}^{n - 1} G[j] \psi^{2 i j} \pmod{q} \\
+    &= \sum_{i = 0}^{n/2 - 1} \psi^{2j(2i) + 2i} G[2i] + \sum_{i = 0}^{n/2 - 1} \psi^{2j(2i+1) + 2i+1} G[2i+1] \pmod{q} \\
+    &= \sum_{i = 0}^{n/2 - 1} \psi^{4ij + 2i} G[2i] + \psi^{2j + 1} \sum_{i = 0}^{n/2 - 1} \psi^{4ij + 2i} G[2i+1] \pmod{q}
+\end{align*}
+
+Define:
+
+\begin{equation*}
+    A_j = \sum_{i = 0}^{n/2 - 1} \psi^{4ij + 2i} G[2i], \quad B_j = \sum_{i = 0}^{n/2 - 1} \psi^{4ij + 2i} G[2i+1]
+\end{equation*}
+
+We then express the result as:
+
+\begin{equation*}
+    \hat{G}_j = A_j + \psi^{2j + 1} B_j \pmod{q}
+\end{equation*}
+
+Next, using the symmetry property $\psi^{k + n} \equiv -\psi^k \pmod{q}$, we can derive:
+
+\begin{equation*}
+    \hat{G}_{j + n/2} = A_j - \psi^{2j + 1} B_j \pmod{q}
+\end{equation*}
+
+Thus, we obtain the fast-NTT update rules:
+
+\begin{align*}
+    \hat{G}_j &= A_j + \psi^{2j+1} B_j \pmod{q} \\
+    \hat{G}_{j + n/2} &= A_j - \psi^{2j+1} B_j \pmod{q}
+\end{align*}
+
+This is structurally identical to the radix-2 butterfly unit in FFT, 
+replacing the complex twiddle factor $e^{-j\frac{2\pi}{N}m}$ with integer twiddle factors $\psi^{2j+1}$ in $\mathbb{Z}_q$.
 
 \subsection{Types of Convolutions and Equivalent NTTs}
 
-\subsection{Comparison with Fast Fourier Transform (FFT)}
 
 \section{Limitations of NTT}
 
