@@ -1,0 +1,295 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{authblk}  % For author affiliations
+\usepackage{hyperref} % For hyperlinks
+\usepackage{geometry} % For page margins
+\usepackage{graphicx} % For including images
+\usepackage{amsmath} % For math equations
+\usepackage{amssymb} % For math symbols
+\usepackage{amsthm} % For theorem environments
+\usepackage{amsfonts} % For math fonts
+\usepackage{mdframed} % For boxes around definitions
+\usepackage{mathtools}
+
+% Set definition environment (with box)
+\newtheorem{definition}{Definition}[section]
+\surroundwithmdframed[
+    linewidth=0.5pt,
+    innertopmargin=5pt,
+    innerbottommargin=5pt,
+    skipabove=\baselineskip,
+    skipbelow=\baselineskip
+]{definition}
+
+\geometry{
+    a4paper,
+    margin=1in
+}
+
+% Set paragraph spacing
+\setlength{\parskip}{1.5ex plus 0.5ex minus 0.2ex}
+
+\title{
+    An Introduction to Number Theoretic Transform in Post-Quantum Lattice Cryptography \\
+    \large EE5163 Advanced Digital Signal Processing: Final Report 
+}
+
+\author[1]{
+    Lo-Chun, Chou \\
+    \small R13922136
+}
+
+\affil[1]{Department of Computer Science, National Taiwan University}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    In the domain of post-quantum cryptography (PQC), 
+    lattice-based cryptography stands out as one of the most promising approaches due to its balanced performance between security and efficiency. 
+    A key computational task in these schemes is polynomial multiplication, 
+    where Number Theoretic Transform (NTT) is particularly effective for this task. 
+    %
+    NTT achieves quasilinear time complexity$O(n \log n)$, 
+    similar to the Fast Fourier Transform (FFT), 
+    but operates entirely over integers, 
+    thus avoiding rounding errors from floating-point arithmetic.
+    %
+    In this report, we explore the foundations of NTT, 
+    drawing from some recent research papers, 
+    and provide an overview of its principles, implementation strategies, 
+    and applications in lattice-based cryptographic systems.
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{Motivation}
+
+While both Number Theoretic Transform (NTT) and Fast Fourier Transform (FFT) are used in polynomial multiplication, 
+NTT is a relative new approach, which is often not covered in the textbooks. 
+This lack of accessible resources is also noted in the reference work 
+\emph{A Beginner's Guide to Number Theoretic Transforms (NTTs)}, 
+where the authors mentioned that the lack of guidance and tutorial available in one place is the main obstacle for learning NTT\cite{beginner_guide}, 
+which is also the reason why they wrote the material.
+
+While the beginner's guide offers a solid introduction to the basic ideas of NTT, 
+it occasionally assumes familiarity with advanced mathematical concepts. 
+Therefore, we expand upon its foundation by including additional mathematical background, 
+clarifying essential concepts such as rings, primitive roots, and modular arithmetic, 
+so all mathematical backgrounds that are needed but unfamiliar to a non-math-major would be covered.
+
+Furthermore, 
+we conclude with a brief example introducing the applications of NTT in real-world scenarios, 
+so that we can move beyond the theoretical part, gaining a full picture of the concept of NTT.
+
+\subsection{Polynomial Multiplication in Cryptographic Systems}
+
+\subsection{Report Structure}
+
+\section{Preliminaries: Mathematical Foundations of the Number Theoretic Transform}
+\subsection{Notations and Definitions}
+
+To unify the notations and definitions, in this report, we assume that if
+given two polynomials $G(x)$ and $H(x)$, then they are of degree $n-1$ if not specified.
+
+\subsection{Rings}
+
+To properly define primitive roots and illustrate the structure of the Number Theoretic Transform (NTT), 
+it is necessary to first introduce the concepts of rings, ideals, and quotient rings. 
+
+These algebraic structures are needed because they provide the foundation for polynomial multiplication in NTT, 
+since in order to do polynomial multiplication for polynomials $G(x)$ and $H(x)$, 
+both of them must belong to the same quotient ring. 
+Due to the fact that quotient rings are constructed on the notions of rings and ideals, 
+we begin by briefly reviewing these foundational concepts.
+
+\begin{definition}[Ring, \cite{algebra}, pp.~85--86]
+    A set $R$ is called a \textbf{ring} if it has two binary operations, written as addition and multiplication, 
+    satisfying the following axioms for all $a, b, c \in R$:
+    \begin{enumerate}
+        \item $a + b = b + a$.
+        \item $a + (b + c) = (a + b) + c$.
+        \item An element $0$ in $R$ exists such that $0 + a = a$ for all $a$.
+        \item For each $a \in R$ an element $-a \in R$ exists such that $a + (-a) = 0$.
+        \item $a(bc) = (ab)c$.
+        \item An element $1$ in $R$ exists such that $1 \cdot a = a = a \cdot 1$ for all $a$.
+        \item $a (b + c) = ab + ac$ and $(b + c)a = ba + ca$.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[Ideal, \cite{ideal_quotientring}, p.~1]
+    A subset $A$ of a ring $R$ (commutative, with $1$) is said to be an \textbf{ideal} if
+    \begin{enumerate}
+        \item $0 \in A$ and $a, b \in A \Rightarrow a + b, -a \in A$ (so $A$ is an additive subgroup of $R$).
+        \item $(a \in A, r \in R)$ $ra \in A$.
+    \end{enumerate}
+\end{definition}
+
+Intuitively, 
+an ideal is a special subset of a ring, 
+which includes the zero element and is closed under addition, 
+also, it would satisfy that every multiple of an element in $A$ is also in $A$.
+
+\begin{definition}[Quotient Ring, \cite{ideal_quotientring}, p.~3]
+    Let $A$ be an ideal in the ring $R$.
+    The \textbf{quotient ring} $R/A$ is defined as follows:
+    \begin{align*}
+        \text{Set} &\coloneq \{r + A \mid r \in R\} \qquad \text{(additive cosets)} \\
+        0 &\coloneq A \\
+        1 &\coloneq 1 + A \\
+        (r + A) + (s + A) &\coloneq (r + s) + A \\
+        (r + A)(s + A) &\coloneq (rs) + A \\
+    \end{align*}
+    where $r, s \in R$.
+\end{definition}
+
+To be simple, 
+a quotient ring $R/A$ is formed by grouping elements of the ring $R$ into disjoint sets called cosets, 
+where each coset has the form $r + A = \{r + a \mid r \in R\}$. 
+These cosets partition the ring in a way that reflects the structure of the ideal $A$.
+
+The quotient rings and 
+we treat every element in the same coset as "equivalent", just like in modular arithmetic. 
+For example, in the integers, $\mathbb{Z}/n\mathbb{Z}$ represents the ring of integers modulo $n$, where all numbers differing by a multiple of $n$ are considered the same. 
+In the same way, a quotient ring allows us to "mod out" an ideal $A$ and treat every element in $A$ as zero, simplifying the structure of the ring and allowing new algebraic manipulations.
+
+\subsection{Modular Arithmetic and Roots of Unity}
+
+In this subsection, we first introduce the concept of residue class modulo $n$, 
+in order to be used in defining $\mathbb{Z}_n$, 
+then we further define the order of an integer under modulo $n$, 
+so that primitive root can be defined. 
+The reason why primitive root is needed is that it is used to construct the NTT matrix, 
+which we would talk about the details in the next subsection.
+
+\begin{definition}[Residue Class Modulo $n$, \cite{algebra}, p.~30]
+    If $a$ is an integer, its equivalent class $[a]$ with respect to congruence modulo $n$ is called its \textbf{residue class modulo $n$}, 
+    and we write $\overline{a} = [a]$ for convenience: 
+    \begin{equation}
+    \overline{a} = [a] = \{x \in \mathbb{Z} \mid x \equiv a \pmod{n}\}.
+    \end{equation}
+\end{definition}
+
+Intuitively saying, after we selected an integer $n$ to be the modulus, 
+we can divide all the integers into $n$ classes, 
+each class is a set of integers that having the same remainder when divided by $n$.
+
+Therefore, for any integer $n$, there are $n$ residue classes modulo $n$, 
+which are $\overline{0}, \overline{1}, \overline{2}, \ldots, \overline{n - 1}$, 
+if we collect all of these residue classes as a set, 
+then we get the set of integers modulo $n$, 
+which is defined as follows:
+
+\begin{definition}[Integers Modulo $n$, \cite{algebra}, p.~30]
+    The set of all residue classes modulo $n$ is denoted 
+    \begin{equation}
+    \mathbb{Z}_n = \{\overline{0}, \overline{1}, \overline{2}, \ldots, \overline{n - 1}\}.
+    \end{equation}
+    and is called the set of \textbf{integers modulo $n$}.
+\end{definition}
+
+Before introducing the definition of primitive root, 
+we first define the order of an integer modulo $n$ as follows:
+
+\begin{definition}[Order of an Integer Modulo $n$ , \cite{number_theory}, p.~147]
+    Let $n > 1$ and $\gcd(a, n) = 1$. 
+    The \textbf{order of $a$ modulo $n$} is the smallest positive integer $k$ such that
+    \begin{equation}
+    a^k \equiv 1 \pmod{n}.
+    \end{equation}
+\end{definition}
+
+Using the definition of order, we can then define the primitive root as follows:
+
+\begin{definition}[Primitive Root, \cite{number_theory}, p.~150]
+    If $\gcd(a, n) = 1$ and $a$ is of order $\varphi(n)$ modulo $n$, 
+    then $a$ is called a \textbf{primitive root} of the integer $n$.
+    Equivalently, $a$ is a primitive root modulo $n$ if
+    \begin{equation}
+    a^{\varphi(n)} \equiv 1 \pmod{n} \quad \text{but} \quad a^k \not\equiv 1 \pmod{n} \quad \forall \ 1 \leq k < \varphi(n).
+    \end{equation}
+\end{definition}
+
+Note that the primitive root may not be unique, and since we use the primitive root to construct the NTT matrix, 
+the NTT of a polynomial may not be unique and would depend on the choice of the primitive root.
+\cite[pp.~5--6]{beginner_guide}
+\bigskip
+
+In the context of NTT, we choose the modulus $n$ to be a prime number, let it be denoted as $q$, 
+and under the assumption that our polynomials $G(x)$ and $H(x)$ are of degree $n-1$, 
+we try to find primitive roots $\omega$ that would satisfy:
+
+\begin{equation}
+    \omega^n \equiv 1 \pmod{q} \quad \text{and} \quad \omega^k \not\equiv 1 \pmod{q} \quad \forall \ 1 \leq k < n.
+\end{equation}
+
+Which means that if we're trying to do convolution of polynomials of degree $3$, 
+then we should find a primitive root that would be congruent to $1$ when raised to the power of $4$, 
+under some choice of modulus $q$.
+
+And such $\omega$ is called the \textbf{primitive $n$-th root of unity} in the ring $\mathbb{Z}_q$.
+\cite[p.~4]{beginner_guide}
+
+\subsection{NTT: Discrete Fourier Transform over Finite Fields}
+
+\subsection{Forward and Inverse NTT Algorithms}
+
+\subsection{Types of Convolutions and Equivalent NTTs}
+
+\subsection{Comparison with Fast Fourier Transform (FFT)}
+
+\section{Limitations of NTT}
+
+\subsection{Parameter Restrictions and Ring Compatibility}
+
+\subsection{Negative Wrapped Convolution and Modulus Conditions}
+
+\subsection{Hardware Bottlenecks and Communication Overheads}
+
+In hardware implementations of the Number Theoretic Transform (NTT), 
+one major source of inefficiency arises from the intricate data communication between adjacent computation stages. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Final_img/CT_butterfly.png}
+    \caption{Butterfly Diagram of the Cooley–Tukey NTT Algorithm. Source: \url{https://k.rypto.cafe/assets/images/misc/ct_butterfly.png}}
+    \label{fig:butterfly}
+\end{figure}
+
+As visualized in the butterfly diagram of the Cooley–Tukey NTT algorithm, 
+multiple stages are required to process even small-length inputs, 
+and each stage introduces data dependencies that result in extensive data movement. 
+This leads to increased wiring complexity and higher area and energy overhead when deploying NTT on ASIC or FPGA-based accelerators. 
+For in-memory computing architectures, 
+these inefficiencies translate into additional shift operations to align data with memory bitlines, 
+further increasing latency and hardware cost.
+
+
+\subsection{Handling NTT-Unfriendly Rings and Algorithmic Alternatives}
+
+\section{Applications of NTT in Lattice-Based Cryptography}
+
+\subsection{NTT in Post-Quantum Cryptographic Schemes}
+
+\subsection{Error-Resilient and Hardware-Efficient Implementations}
+
+\subsection{Optimized NTT Variants for Real-World Schemes}
+
+\section{Conclusion and Future Directions}
+
+\subsection{Summary of Key Concepts}
+
+\subsection{Challenges and Open Research Problems}
+
+
+
+
+
+
+\bibliographystyle{plain}
+\bibliography{ADSP_final_ref} 
+
+\end{document} 
