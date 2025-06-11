@@ -65,7 +65,7 @@ An example result of the code is shown as the following image:
     \includegraphics[width=\textwidth]{problem_1/prob1_result.png}
 \end{figure}
 
-For the code, please refer to the attached python file on NTUCOOL.
+For the code, please refer to the attached python file \codeword{problem_1.py} on NTUCOOL.
 
 \section*{(2)}
 
@@ -100,7 +100,31 @@ To compute the convolution operation of $y[n] =  x[n] * h[n]$, where:
 \end{align*}
 
 by an efficient way that the number of multiplciations is minimized, 
-we can 
+first observe that $h[n]$ is symmetric, 
+since it fits the two conditions in lecture note "ADSP\_Write6.pdf", p.439: 
+
+\begin{itemize}
+    \item $M$ is small
+    \item The filter has some symmetric relation
+\end{itemize}
+
+This is the case that we can use "direct computing" to compute the convolution operation:
+
+\begin{align*}
+    y[n] 
+    &= 
+    \textcolor{Green}{0.09 x[n - 3]} + 
+    \textcolor{blue}{0.36 x[n - 2]} + 
+    \textcolor{orange}{0.55 x[n - 1]} + 
+    \textcolor{orange}{0.55 x[n]} + 
+    \textcolor{blue}{0.36 x[n + 1]} + 
+    \textcolor{Green}{0.09 x[n + 2]} \\
+    &= 
+    \textcolor{Green}{0.09 (x[n - 3] + x[n + 2])} + 
+    \textcolor{blue}{0.36 (x[n - 2] + x[n + 1])} + 
+    \textcolor{orange}{0.55 (x[n - 1] + x[n])} \\
+\end{align*}
+
 
 \section*{(4)}
 
@@ -127,65 +151,128 @@ And the following are the formulas showing the amount of multiplications for eac
     S \times (2 \times \mathrm{MUL}_{P} + 3 P), \qquad \text{where } S = \left\lceil \frac{N}{L} \right\rceil
 \end{align*}
 
-
 \end{itemize}
 
+Since the values are large and hard to calculate by hand, 
+I wrote a python code to calculate the results of the three approaches.
+\bigskip
+
+Instead of showing the code here, 
+I attached the code to NTUCOOL since it's too long.
+
+Also, In the following subproblems, I will show the output for executing the code, 
+which shows detailed process for finding the optimal approach.
+If the code needs to be executed and checked, 
+execute \codeword{python 4.py}, 
+and modify the input parameters \codeword{N} and \codeword{M} to get the results:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{problem_4/code_input_setting.png}
+\end{figure}
+
+Another thing is that, since the output is also quite lengthy, 
+the answer is written after the output.
 
 \subsection*{(a)}
 
 If $\mathrm{length}(y[n]) = 250$, then we have $N = 1500, \ M = 250$.
-\bigskip
-
-\underline{Direct computing}:
-
-\begin{align*}
-    3 \times 1500 \times 250 = 1125000
-\end{align*}
-
-\underline{Non-sectioned convolution}:
-\bigskip
-
-We have $P \geq 1500 + 250 - 1 = 1749$, before applying the formula, 
-we first calculate $\mathrm{MUL}_{P}$ by the code, 
-and we could get the resulting optimal $P$ as $2016$.
-% Since $1749 = 3 \times 583 = 3 \times 11 \times 53$
+The derivation process is shown as the following image:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{HW5_img/4_a}
+    \includegraphics[width=0.9\textwidth]{problem_4/4_a.png}
 \end{figure}
 
-Thus, the number of multiplications using IFFT and FFT with $P = 2016$ ($\mathrm{MUL}_{2016} = 12728$) is:
+From the image, we can see that the optimal condition is: 
+\begin{itemize}
+    \item (i) Non-sectioned approach
+    \item (ii) $P = 2016$
+    \item (iii) $31504$ real multiplications
+\end{itemize}
 
-\begin{align*}
-    2 \times \mathrm{MUL}_{2016} + 3 \times 2016 = 2 \times 12728 + 3 \times 2016 = 25456 + 6048 = 31504
-\end{align*}
+\subsection*{(b)}
 
-\underline{Sectioned convolution}:
+If $\mathrm{length}(y[n]) = 50$, then we have $N = 1500, \ M = 50$.
+The derivation process is shown as the following image:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{problem_4/4_b.png}
+\end{figure}
+
+From the image, we can see that the optimal condition is: 
+\begin{itemize}
+    \item (i) Non-sectioned approach
+    \item (ii) $P = 1680$
+    \item (iii) $25880$ real multiplications
+\end{itemize}
+
+% \underline{Direct computing}:
+
+% \begin{align*}
+%     3 \times 1500 \times 250 = 1125000
+% \end{align*}
+
+% \underline{Non-sectioned convolution}:
+% \bigskip
+
+% We have $P \geq 1500 + 250 - 1 = 1749$, before applying the formula, 
+% we first calculate $\mathrm{MUL}_{P}$ by the code, 
+% and we could get the resulting optimal $P$ as $2016$.
+% % Since $1749 = 3 \times 583 = 3 \times 11 \times 53$
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{HW5_img/4_a}
+% \end{figure}
+
+% Thus, the number of multiplications using IFFT and FFT with $P = 2016$ ($\mathrm{MUL}_{2016} = 12728$) is:
+
+% \begin{align*}
+%     2 \times \mathrm{MUL}_{2016} + 3 \times 2016 = 2 \times 12728 + 3 \times 2016 = 25456 + 6048 = 31504
+% \end{align*}
+
+% \underline{Sectioned convolution}:
 
 % \begin{align*}
 %     \left\lceil \frac{1500}{250} \right\rceil \times (2 \times \mathrm{MUL}_{2016} + 3 \times 2016) = 6 \times 31504 = 189024
 % \end{align*}
 
-\subsection*{(b)}
-
-If $\mathrm{length}(y[n]) = 50$, then we have $N = 1500, \ M = 50$.
-\bigskip
-
-\underline{Direct computing}:
-
-\begin{align*}
-    3 \times 1500 \times 50 = 225000
-\end{align*}
-
-\underline{Non-sectioned convolution}:
-
 
 \subsection*{(c)}
 
+If $\mathrm{length}(y[n]) = 10$, then we have $N = 1500, \ M = 10$.
+The derivation process is shown as the following image:
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{problem_4/4_c.png}
+\end{figure}
 
+From the image, we can see that the optimal condition is: 
+\begin{itemize}
+    \item (i) Sectioned approach
+    \item (ii) $P = 72$
+    \item (iii) $19584$ real multiplications
+\end{itemize}
 
+\subsection*{(d)}
+
+If $\mathrm{length}(y[n]) = 2$, then we have $N = 1500, \ M = 2$.
+The derivation process is shown as the following image:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{problem_4/4_d.png}
+\end{figure}
+
+From the image, we can see that the optimal condition is: 
+\begin{itemize}
+    \item (i) Direct approach
+    \item (ii) No use of $P$
+    \item (iii) $9000$ real multiplications
+\end{itemize}
 
 \section*{(5)}
 
@@ -320,7 +407,7 @@ the answer is:
 
 After getting the values of \codeword{x1}, \codeword{x2}, \codeword{x3}, 
 we try to recover the original data by the following process, 
-note that only the recovery process of \codeword{x1} is shown since the rest are the same:
+note that only the recovery process of \codeword{[1 0 1]} is shown since the rest are the same:
 
 \begin{figure}[H]
     \centering
@@ -338,9 +425,9 @@ Thus, we can recover the original data by the process shown in the image above.
 
 \subsection*{(c)}
 
-
-
-
+In lecture slide "ADSP\_Write7.pdf", p.522, 
+it is said that we can replace Walsh transform with other orthogonal transforms in CDMA, 
+hence, it is \underline{suitable} using Haar transform.
 
 
 \section*{Extra problem (ID ends with $1, 6$)}
