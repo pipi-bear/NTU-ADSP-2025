@@ -9,6 +9,7 @@
 \usepackage{amsthm} % For theorem environments
 \usepackage{amsfonts} % For math fonts
 \usepackage{mdframed} % For boxes around definitions
+\usepackage{float} % For H option in figure environment
 \usepackage{mathtools}
 
 % Set definition environment (with box)
@@ -62,7 +63,7 @@
     A key computational task in these schemes is polynomial multiplication, 
     where Number Theoretic Transform (NTT) is particularly effective for this task. 
     %
-    NTT achieves quasilinear time complexity$O(n \log n)$, 
+    NTT achieves quasilinear time complexity $O(n \log n)$, 
     similar to the Fast Fourier Transform (FFT), 
     but operates entirely over integers, 
     thus avoiding rounding errors from floating-point arithmetic.
@@ -90,13 +91,34 @@ Therefore, we expand upon its foundation by including additional mathematical ba
 clarifying essential concepts such as rings, primitive roots, and modular arithmetic, 
 so all mathematical backgrounds that are needed but unfamiliar to a non-math-major would be covered.
 
-Furthermore, 
-we conclude with a brief example introducing the applications of NTT in real-world scenarios, 
-so that we can move beyond the theoretical part, gaining a full picture of the concept of NTT.
+Our aim is to provide a basic overview of NTT, 
+so that after reading this report, 
+readers would have a basic understanding of 
+how NTT works, the jargon used in this field, its application and limitations.
 
-\subsection{Polynomial Multiplication in Cryptographic Systems}
+% Furthermore, 
+% we conclude with a brief example introducing the applications of NTT in real-world scenarios, 
+% so that we can move beyond the theoretical part, gaining a full picture of the concept of NTT.
+
+% \subsection{Polynomial Multiplication in Cryptographic Systems}
 
 \subsection{Report Structure}
+
+In this report, 
+we would first introduce the mathematical foundations of NTT, 
+which would cover the concepts required for understanding the definitions and basic ideas.
+
+After we're equipped with the necessary knowledge, 
+we could move on to check the definitions for both forward and inverse NTT, 
+some advantages of NTT are then shown after we're familiar with the definitions.
+Additionally, we would also compare NTT with FFT rigorously to see how they are similar in their structures.
+
+Finally, we would briefly discuss the applications of NTT in lattice-based cryptography, 
+followed with its limitations.
+
+In the last part, 
+we would conclude with a brief summary of the report, 
+and pointed out some future directions for further research.
 
 \section{Preliminaries: Mathematical Foundations of the Number Theoretic Transform}
 
@@ -449,7 +471,19 @@ Other notations follow the same convention as in the preliminaries above.
 In the previous subsection, 
 we introduced the formulation of the two widely used quotient rings in lattice-based schemes, 
 if we focus on the case that the ideal is chosen to be of the form $(x^n + 1)$, 
-we then denote them by $R$ and $R_q$, respectively:
+then the convolution we're dealing with is the \textbf{negative-wrapped convolution}, or \textbf{negacyclic convolution}.
+The reason why we're not focusing on the positive-wrapped convolution, even though its more intuitive, 
+is because in order to compute:
+
+\begin{equation*}
+    G(x) * H(x) \pmod{x^n + 1}
+\end{equation*}
+
+The positive-wrapped convolution requires the length of the polynomials to be extended to $2n$, 
+which doubles the input length.
+\cite[p.~5]{fpga}
+
+To continue with negative-wrapped convolution, we then denote the quotient rings by $R$ and $R_q$, respectively:
 
 \begin{align*}
     R = \mathbb{Z}[x] / (x^n + 1) \quad \text{and} \quad R_q = \mathbb{Z}_q[x] / (x^n + 1)
@@ -465,9 +499,17 @@ which
 
 we could define the NTT of a polynomial $G(x) \in R_q$ as:
 
-\begin{equation*}
-    \hat{G} = \mathbf{NTT}(G(x)) = \sum_{j = 0}^{n - 1} G[j] \omega^{i j} \pmod{q}
-\end{equation*}
+\begin{align*}
+    \hat{G} &= \mathbf{NTT}(G(x)) = 
+    \begin{bmatrix}
+        \hat{G}[0] \\
+        \hat{G}[1] \\
+        \vdots \\
+        \hat{G}[n-1]
+    \end{bmatrix} \\
+    \hat{G}[i] &= \sum_{j = 0}^{n - 1} G[j] \psi^j \omega^{i j} \pmod{q} \quad \text{for } i = 0, 1, \ldots, n-1
+\end{align*}
+\cite[p.~8]{beginner_guide}
 
 Representing in the matrix multiplication form, we have:
 
@@ -475,11 +517,10 @@ Representing in the matrix multiplication form, we have:
     \hat{G} 
     = \mathbf{NTT}(G(x)) 
     = \begin{bmatrix}
-        \omega^0 & \omega^0 & \cdots & \omega^0 \\
-        \omega^0 & \omega^1 & \cdots & \omega^{n-1} \\
-        \omega^0 & \omega^2 & \cdots & \omega^{2(n-1)} \\
+        \psi^0 \omega^0 & \psi^1 \omega^0 & \cdots & \psi^{n-1} \omega^0 \\
+        \psi^0 \omega^0 & \psi^1 \omega^1 & \cdots & \psi^{n-1} \omega^{n-1} \\
         \vdots & \vdots & \ddots & \vdots \\
-        \omega^0 & \omega^{n-1} & \cdots & \omega^{(n-1)(n-1)}
+        \psi^0 \omega^0 & \psi^1 \omega^{n-1} & \cdots & \psi^{n-1} \omega^{(n-1)(n-1)} \\
     \end{bmatrix}
     \begin{bmatrix}
         G[0] \\
@@ -494,9 +535,10 @@ which satisfies $\psi^2 \equiv \omega \pmod{q}$, hence,
 by plugging $\psi$ into the equation and the matrix above, 
 we have:
 
-\begin{equation*}
-    \hat{G} = \mathbf{NTT}(G(x)) = \sum_{j = 0}^{n - 1} G[j] \psi^{2 i j} \pmod{q}
-\end{equation*}
+\begin{align*}
+    \hat{G} &= \mathbf{NTT}(G(x)) \\
+    \hat{G}[i]  &= \sum_{j = 0}^{n - 1} G[j] \psi^{2ij + j} \pmod{q} \quad \text{for } i = 0, 1, \ldots, n-1
+\end{align*}
 
 and the matrix form:
 
@@ -504,11 +546,10 @@ and the matrix form:
     \hat{G} 
     = \mathbf{NTT}(G(x)) 
     = \begin{bmatrix}
-        (\psi^2)^0 & (\psi^2)^0 & \cdots & (\psi^2)^0 \\
-        (\psi^2)^0 & (\psi^2)^1 & \cdots & (\psi^2)^{n-1} \\
-        (\psi^2)^0 & (\psi^2)^2 & \cdots & (\psi^2)^{2(n-1)} \\
+        \psi^0 & \psi^1 & \cdots & \psi^{n-1} \\
+        \psi^0 & \psi^3 & \cdots & \psi^{3(n-1)} \\
         \vdots & \vdots & \ddots & \vdots \\
-        (\psi^2)^0 & (\psi^2)^{n-1} & \cdots & (\psi^2)^{(n-1)(n-1)}
+        \psi^0 & \psi^{(2n-1)} & \cdots & \psi^{(2n-1)(n-1)} \\
     \end{bmatrix}
     \begin{bmatrix}
         G[0] \\
@@ -521,10 +562,37 @@ and the matrix form:
 And the inverse NTT of $\hat{G}$ is denoted as $\mathbf{NTT^{-1}}(\hat{G})$, 
 and defined as:
 
-\begin{equation*}
-    G = \mathbf{NTT^{-1}}(\hat{G}) = \sum_{j = 0}^{n - 1} n^{-1} \hat{G}[j] \omega^{-i j} \pmod{q}
-\end{equation*}
-\cite[p.~4]{fpga}
+\begin{align*}
+    G &= \mathbf{NTT^{-1}}(\hat{G}) \\
+    G[i] &= \sum_{j = 0}^{n - 1} n^{-1} \hat{G}[j] \psi^{-j}\omega^{-i j} \pmod{q} \quad \text{for } i = 0, 1, \ldots, n-1
+\end{align*}
+
+Similarly, if we plug $\psi^2 \equiv \omega \pmod{q}$ in, then we have:
+
+\begin{align*}
+    G[i] 
+    &= \sum_{j = 0}^{n - 1} n^{-1} \hat{G}[j] \psi^{- j}(\psi^2)^{-i j} \pmod{q} \quad \text{for } i = 0, 1, \ldots, n-1 \\
+    &= \sum_{j = 0}^{n - 1} n^{-1} \hat{G}[j] \psi^{-(2ij + j)} \pmod{q} \quad \text{for } i = 0, 1, \ldots, n-1
+\end{align*}
+
+\subsection{Advantages of NTT}
+
+Albeit we focused on the negative-wrapped convolution in the previous subsection, 
+and assumed the special case where $n = 2^k$, which is used in the general case, 
+for all kinds of NTT and INTT, 
+they possess the following advantages:
+
+\begin{itemize}
+    \item Both NTT and INTT are linear transformations.
+    \item NTT preserves the randomness, which means that given a random polynomial $G(x)$, 
+    $\hat{G}(x) = \mathbf{NTT}(G(x))$ is also a random polynomial.
+    \item Both NTT and INTT preserve the dimension and bit length of the input polynomial, 
+    meaning that $\hat{G}(x)$ and $G(x)$ have the same dimension and bit length.
+    This allows the result of NTT $\hat{G}(x)$ to be stored in the same memory space as $G(x)$.
+    \item If an input polynomial $G(x)$ requires to be involved in multiple multiplications, 
+    we could compute the NTT of $G(x)$ once, and store $\hat{G}(x)$ to use in subsequent multiplications.
+\end{itemize}
+\cite[p.~5]{survey}
 
 \subsection{Comparison with Fast Fourier Transform (FFT)}
 
@@ -566,101 +634,195 @@ This is achieved by utilizing the two properties of the primitive $2n$-th root o
 
 By these properties, 
 we could divide the calculation of $n$-point NTT and INTT into two $\frac{n}{2}$-point NTT and INTT, 
-similar to what we have done in the DFT case as below:
+similar to what we have done in the DFT case:
 
 \begin{align*}
-    \hat{G} 
-    &= \mathbf{NTT}(G(x)) \\
-    &= \sum_{j = 0}^{n - 1} G[j] \psi^{2 i j} \pmod{q} \\
+    \hat{G} &= \mathbf{NTT}(G(x)) \\
+    \hat{G}[i]  &= \sum_{j = 0}^{n - 1} G[j] \psi^{2ij + j} \pmod{q} \quad \text{for } i = 0, 1, \ldots, n-1
 \end{align*}
 
 Split the summation into even and odd indices:
 
 \begin{align*}
-    \hat{G} 
-    &= \sum_{j = 0}^{n - 1} G[j] \psi^{2 i j} \pmod{q} \\
-    &= \sum_{i = 0}^{n/2 - 1} \psi^{2j(2i) + 2i} G[2i] + \sum_{i = 0}^{n/2 - 1} \psi^{2j(2i+1) + 2i+1} G[2i+1] \pmod{q} \\
-    &= \sum_{i = 0}^{n/2 - 1} \psi^{4ij + 2i} G[2i] + \psi^{2j + 1} \sum_{i = 0}^{n/2 - 1} \psi^{4ij + 2i} G[2i+1] \pmod{q}
+    \hat{G}[i] 
+    &= \sum_{j = 0}^{n - 1} G[j] \psi^{2ij + j} \pmod{q} \\
+    &= \sum_{j = 0}^{n/2 - 1} \psi^{4ij + 2j} G[2j] + \sum_{j = 0}^{n/2 - 1} \psi^{4ij + 2i + 2j + 1} G[2j+1] \pmod{q} \\
+    &= \sum_{j = 0}^{n/2 - 1} \psi^{4ij + 2j} G[2j] + \underbrace{\psi^{2i + 1}}_{\text{twiddle factor}}\sum_{j = 0}^{n/2 - 1} \psi^{4ij + 2j} G[2j+1] \pmod{q}
 \end{align*}
 
 Define:
 
 \begin{equation*}
-    A_j = \sum_{i = 0}^{n/2 - 1} \psi^{4ij + 2i} G[2i], \quad B_j = \sum_{i = 0}^{n/2 - 1} \psi^{4ij + 2i} G[2i+1]
+    A_i = \sum_{j = 0}^{n/2 - 1} \psi^{4ij + 2j} G[2j], \quad B_i = \sum_{j = 0}^{n/2 - 1} \psi^{4ij + 2j} G[2j+1]
 \end{equation*}
 
-We then express the result as:
+We could then express the above result as:
 
 \begin{equation*}
-    \hat{G}_j = A_j + \psi^{2j + 1} B_j \pmod{q}
+    \hat{G}[i] = A_i + \psi^{2i + 1} B_i \pmod{q}
 \end{equation*}
 
 Next, using the symmetry property $\psi^{k + n} \equiv -\psi^k \pmod{q}$, we can derive:
 
 \begin{equation*}
-    \hat{G}_{j + n/2} = A_j - \psi^{2j + 1} B_j \pmod{q}
+    \hat{G}[i + n/2] = A_i - \psi^{2i + 1} B_i \pmod{q}
 \end{equation*}
 
-Thus, we obtain the fast-NTT update rules:
+Thus, we obtain the fast-NTT update rules, which could be applied to each butterfly module:
 
 \begin{align*}
-    \hat{G}_j &= A_j + \psi^{2j+1} B_j \pmod{q} \\
-    \hat{G}_{j + n/2} &= A_j - \psi^{2j+1} B_j \pmod{q}
+    \hat{G}[i] &= A_i + \psi^{2i + 1} B_i \pmod{q} \\
+    \hat{G}[i + n/2] &= A_i - \psi^{2i + 1} B_i \pmod{q}
 \end{align*}
 
-This is structurally identical to the radix-2 butterfly unit in FFT, 
-replacing the complex twiddle factor $e^{-j\frac{2\pi}{N}m}$ with integer twiddle factors $\psi^{2j+1}$ in $\mathbb{Z}_q$.
+Since we have already assumed that $n = 2^k$, the process can be repeated for all coefficients, 
+and this is structurally identical to the butterfly unit in FFT, 
+replacing the complex twiddle factor $e^{-j\frac{2\pi}{N}m}$ with integer twiddle factors $\psi^{2i+1}$ in $\mathbb{Z}_q$.
+\cite[p.~12]{beginner_guide}
 
-\subsection{Types of Convolutions and Equivalent NTTs}
+An example of the butterfly structure is shown in the following figure:
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Final_img/NTT_butterfly_ex.png}
+    \caption{CT-butterfly based NTT for size $n=8$. Source: \url{https://shorturl.at/YE629}}
+    \label{fig:NTT_butterfly_ex}
+\end{figure}
+
+
+\section{Applications of NTT in Lattice-Based Cryptography}
+
+Lattice-based cryptography has emerged as a leading candidate in the post-quantum cryptography landscape, 
+due to its strong security guarantees and efficient implementation potential. 
+
+Among various techniques, the Number Theoretic Transform (NTT) plays a crucial role, 
+particularly in accelerating polynomial multiplication within lattice-based schemes. 
+
+Unlike the Discrete Fourier Transform (DFT), which operates over the complex field, 
+NTT works over finite fields, allowing all operations to be conducted on integers, and stay within modular arithmetic. 
+This avoids the errors caused by floating-point rounding, 
+and enables faster, more reliable computations. 
+
+The National Institute of Standards and Technology (NIST) has emphasized the importance of NTT in its post-quantum cryptography standardization process, 
+particularly in schemes like CRYSTALS-Kyber and CRYSTALS-Dilithium, 
+which both rely on polynomial multiplication modulo $x^n + 1$ over $\mathbb{Z}_q$. 
+\cite[p.~2]{fpga}
+
+Thanks to the quasi-linear time complexity $O(n \log n)$, 
+NTT significantly outperforms traditional multiplication methods and forms the computational backbone 
+of many signature, encryption, and key encapsulation mechanisms in standardized lattice-based cryptosystems. 
+
+By ensuring both speed and security, 
+NTT enables practical deployment of quantum-resistant cryptographic protocols across real-world systems.
 
 \section{Limitations of NTT}
 
-\subsection{Parameter Restrictions and Ring Compatibility}
+Despite the significant advantages and its usage in lattice-based cryptography, 
+NTT is not without limitations. 
 
-\subsection{Negative Wrapped Convolution and Modulus Conditions}
+The efficiency of NTT relies heavily on careful parameter selection—particularly the modulus $q$ and the size $n$. 
+Additionally, unlike DFT which supports a broader range of input types and applications, 
+NTT is restricted to integer arithmetic in finite fields, making it less versatile outside cryptographic domains. 
+
+These constraints also introduce implementation challenges, 
+especially in resource-constrained environments or when generalizing to new cryptographic constructions.
+
+In the following subsections, 
+we would discuss the limitations mentioned above in detail.
+
+\subsection{Parameter Restrictions}
+
+The traditional form of NTT has two major problems in its applications:
+
+\begin{enumerate}
+    \item Requires $2n \mid q - 1$ 
+    \item $n = 2^k, \text{ for some } k \in \mathbb{N}$
+\end{enumerate}
+
+To relax the first restriction, some approaches are proposed, 
+such as \textbf{preprocess-then-NTT} (Pt-NTT) and \textbf{truncated-NTT} (T-NTT), 
+where the former is combined with the \textbf{Karatsuba technique} to reduce the number of multiplications at the cost of additional additions.
+\cite[p.~416]{ntt_all}
+
+Viewing from the whole picture, 
+research aiming to weaken the above restrictions over recent years can be categorized into three groups by their methods:
+
+\begin{enumerate}
+    \item Method based on incomplete FFT trick.
+    \item Method based on splitting polynomial ring.
+    \item Method based on large modules.
+\end{enumerate}
+\cite[p.~11]{survey}
+
+For the first two methods, the value range of modulus $q$ could be expanded, 
+however, the limitations on $q$ still cannot be ignored since $q$ must still be a NTT-friendly prime such that
+$\mathbb{Z}_q$ is a finite field and $x^n \pm 1$ can be split into polynomials of small degree over $\mathbb{Z}_q$.
+Moreover, the second approach leads to more modular implementation. 
+\cite[pp.~14--15]{survey}
+
+For the last method, which is based on large modules, 
+could be applied to any original modulus $q$, and can completely remove the restrictions on $q$.
+However, it has various drawbacks:
+
+\begin{itemize}
+    \item Greater storage (for coefficients) and computing-resource consumption.
+    \item Need to compute NTT more than once, which is more time and resource consuming, 
+    since the original full NWC-based NTT, the previous two categories to remove the restrictions, 
+    all require only one NTT computation.
+\end{itemize}
+\cite[p.~16]{survey}
 
 \subsection{Hardware Bottlenecks and Communication Overheads}
 
 In hardware implementations of the Number Theoretic Transform (NTT), 
-one major source of inefficiency arises from the intricate data communication between adjacent computation stages. 
+one major source of inefficiency arises from the intricate data dependencies among different NTT stages
+and the required division operations. 
+\cite{bp_ntt}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{Final_img/CT_butterfly.png}
-    \caption{Butterfly Diagram of the Cooley–Tukey NTT Algorithm. Source: \url{https://k.rypto.cafe/assets/images/misc/ct_butterfly.png}}
-    \label{fig:butterfly}
+    \includegraphics[width=0.8\textwidth]{Final_img/NTT_INTT_butterfly.png}
+    \caption{Butterfly Diagram of NTT and INTT using CT and GS algorithms. Source: \url{https://rb.gy/vdxjrn}}
+    \label{fig:NTT_INTT_butterfly}
 \end{figure}
 
-As visualized in the butterfly diagram of the Cooley–Tukey NTT algorithm, 
+As visualized in the left part of the above diagram, for the Cooley-Tukey NTT algorithm, 
 multiple stages are required to process even small-length inputs, 
 and each stage introduces data dependencies that result in extensive data movement. 
-This leads to increased wiring complexity and higher area and energy overhead when deploying NTT on ASIC or FPGA-based accelerators. 
-For in-memory computing architectures, 
-these inefficiencies translate into additional shift operations to align data with memory bitlines, 
-further increasing latency and hardware cost.
 
+To solve the problem, ASIC/FPGA-based accelerators are proposed, 
+however, while the performance is indeed enhanced, 
+they still suffer from frequent data movements between processing components and memory, 
+limitating the perfomance growth.
+\cite{bp_ntt}
 
-\subsection{Handling NTT-Unfriendly Rings and Algorithmic Alternatives}
+To eliminate this data movement bottleneck, 
+some existing in-memory computing techniques are proposed, 
+but they would cause the following problems at the same time:
 
-\section{Applications of NTT in Lattice-Based Cryptography}
+\begin{enumerate}
+    \item Security vulnerabilities, since the computing base are expanded to off-chip memories.
+    \item High are overhead incurred due to introducing complex pheripheral circuits.
+    \item Lossing generality and flexibility since the techniques are specialized for NTT.
+\end{enumerate}
+\cite{bp_ntt}
 
-\subsection{NTT in Post-Quantum Cryptographic Schemes}
+\section{Conclusion}
 
-\subsection{Error-Resilient and Hardware-Efficient Implementations}
+In this report, 
+we provided a comprehensive overview of the Number Theoretic Transform (NTT), 
+covering its mathematical foundations, algorithmic structures, and practical relevance. 
 
-\subsection{Optimized NTT Variants for Real-World Schemes}
+We explored the relationship between NTT and the Discrete Fourier Transform (DFT), 
+and examined the crucial role NTT plays in enabling efficient polynomial arithmetic in lattice-based cryptographic schemes. 
 
-\section{Conclusion and Future Directions}
+Despite its advantages, we also highlighted several limitations, 
+particularly in terms of hardware constraints and algorithmic flexibility
+—which suggest further research and development for broader adoption. 
 
-\subsection{Summary of Key Concepts}
-
-\subsection{Challenges and Open Research Problems}
-
-
-
-
-
+Through this exploration, 
+we aim to offer both an accessible introduction, 
+and a forward-looking perspective on the continued evolution of NTT.
 
 \bibliographystyle{plain}
 \bibliography{ADSP_final_ref} 

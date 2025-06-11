@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{fpga}
 Kasra Ahmadi, Saeed Aghapour, Mehran~Mozaffari Kermani, and Reza Azarderakhsh.
@@ -28,6 +28,14 @@ E.V. Flynn.
 \newblock Lecture notes, University of Oxford, 2005.
 \newblock Lectures for Part A of Oxford FHS in Mathematics and Joint Schools.
 
+\bibitem{ntt_all}
+Zhichuang Liang, Shiyu Shen, Yuantao Shi, Dongni Sun, Chongxuan Zhang, Guoyun
+  Zhang, Yunlei Zhao, and Zhixiang Zhao.
+\newblock Number theoretic transform: Generalization, optimization, concrete
+  analysis and applications.
+\newblock In Yongdong Wu and Moti Yung, editors, {\em Information Security and
+  Cryptology}, pages 415--432, Cham, 2021. Springer International Publishing.
+
 \bibitem{survey}
 Zhichuang Liang and Yunlei Zhao.
 \newblock Number theoretic transform and its applications in lattice-based
@@ -43,5 +51,10 @@ Ardianto Satriawan, Rella Mareta, and Hanho Lee.
 \newblock A complete beginner guide to the number theoretic transform (ntt),
   2024.
 \newblock Last accessed 9 June 2025.
+
+\bibitem{bp_ntt}
+Jingyao Zhang, Mohsen Imani, and Elaheh Sadredini.
+\newblock Bp-ntt: Fast and compact in-sram number theoretic transform with
+  bit-parallel modular multiplication, 2023.
 
 \end{thebibliography}
