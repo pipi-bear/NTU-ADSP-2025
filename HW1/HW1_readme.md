@@ -18,15 +18,19 @@ You can find the images that I attached in `ADSP_HW1_sol.pdf` by checking the su
 
 For the code part, note that:
 
-<font color = "red">The matlab version (`HW1_prob1.m`) is wrong !!</font>
+:warning: <font color = "red">The matlab version (`HW1_prob1.m`) is wrong !!</font>
 > I preserved it only because it's the original version that contains my thoughts
 
 The final handed in file is the python version `HW1_prob.py`, which is also the code that generates the resulting images.
 
 However, <ins>be cautious when using my code since I'm not pretty sure if it's right or not</ins>.
 
-# Score
+# Grade and feedback
 
-For this assignment, I got $12/12$ with an extra point ($+1$).
+## Score
 
-We're not given the correcting details, so I'm not sure if I really got all the things right, but at least you can be sure that my solution is mostly correct :)
+12 / 12
+
+## Feedback
+
+I did not get any feedback for this homework.

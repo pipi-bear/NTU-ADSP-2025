@@ -6,7 +6,7 @@ The directory HW2 contains:
 - solution for ADSP_HW2: `ADSP_HW2_sol.pdf`, `ADSP_HW2_sol.tex`
 > You can choose if you need the pdf veresion or the latex code (the equations can be copied)
 - problem 1 code: `HW2_prob1.py`
-- problem 1 code result images: `prob1_iamges`
+- problem 1 code result images: `prob1_images`
 
 ## Problem 1
 
@@ -40,9 +40,13 @@ Some of the solutions in `ADSP_HW2_sol` mentioned that I've used the contents fr
 
 The ppt resources can be found in the subdirectory `Lecture_notes`, you can download them if needed :)
 
-# Score
+# Grade and feedback
 
-I got $10.44$ out of $12$ in this assignment. The scores for each problem and the mistakes given by the TA are shown below:
+## Score
+
+10.44 / 12 
+
+## Feedback
 
 (1) 16
 圖形有誤，講義p. 115有關transition band的部分，係將原本Hd的值乘上大於0小於1的值，例如講義所寫的乘上0.7與0.2，而因為transition band的位置是在訊號邊緣附近，因此有可能會出現一邊要用F，另一邊要用(F-1)，因此在line 18-26的迴圈中，應先將值算出後再做transition band

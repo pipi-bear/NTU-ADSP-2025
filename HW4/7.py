@@ -71,8 +71,8 @@ def find_nearest_P_values(P0, Pvalues_N, num_neighbors = 4):
 
 def main():
     # Given parameters
-    N = 63  # length(x[n])
-    M = 35  # length(h[n])
+    N = 1500  # length(x[n])
+    M = 250  # length(h[n])
     
     # Step 1: Find L0
     L0 = find_L0(N, M)
