@@ -1,4 +1,11 @@
-# NTU EE: ADSP (2025 Spring)
+<h1 align="center">
+NTU EE: ADSP (2025 Spring)
+</h1>
+
+---
+
+![readme_ex](./readme_example.png)
+> An example screenshot from HW1.
 
 This repository contains the <ins>homework and the lecture notes</ins> when I took the course:
 
